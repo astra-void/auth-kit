@@ -1,17 +1,17 @@
 import { JWTPayload } from "jose";
 
-export interface JWTEncryptParams {
+export interface JWTSignParams {
     payload: JWTPayload;
-    secret: Secret;
+    secret?: Secret;
     options?: {
         salt?: string;
         maxAge?: number;
     };
 }
 
-export interface JWTDecryptParams {
+export interface JWTVerifyParams {
     token: string;
-    secret: Secret;
+    secret?: Secret;
     salt?: string;
 }
 

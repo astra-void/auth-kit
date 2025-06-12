@@ -1,24 +1,22 @@
 {
-  "name": "unnamed-auth-kit",
-  "version": "1.0.0",
+  "name": "@astra/auth-kit",
+  "version": "0.1.0",
   "description": "Lightweight authentication kit for Next.js",
   "main": "dist/index.js",
-  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist/"
+  ],
   "exports": {
     ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
       "types": "./dist/index.d.ts"
-    },
-    "./jwt": {
-      "require": "./dist/jwt/index.js",
-      "types": "./dist/jwt/types.d.ts"
     }
   },
   "scripts": {
-    "build": "tsup src --format esm,cjs --dts",
-    "dev": "tsup src/index.ts --watch --format esm,cjs --dts",
+    "build": "tsup src --format esm,cjs --dts --outDir dist --clean",
+    "dev": "tsup src/index.ts --watch --format esm,cjs --dts --outDir dist",
     "test": "jest --config ./jest.config.js"
   },
   "keywords": [],
@@ -33,6 +31,7 @@
     "@babel/core": "^7.27.4",
     "@babel/preset-env": "^7.27.2",
     "@babel/preset-typescript": "^7.27.1",
+    "@types/bcrypt": "^5.0.2",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.15.30",
     "@types/react": "^19.1.7",
@@ -46,6 +45,9 @@
   },
   "dependencies": {
     "@panva/hkdf": "^1.2.1",
+    "argon2": "^0.43.0",
+    "axios": "^1.9.0",
+    "bcrypt": "^6.0.0",
     "jose": "^6.0.11",
     "uuid": "^11.1.0"
   }
