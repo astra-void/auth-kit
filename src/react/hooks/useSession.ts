@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { AdapterUser } from "../adapter";
-import { User } from "../auth";
+import { AdapterUser } from "../../adapter";
+import { User } from "./types";
 import axios from "axios";
 
 export function useSession(): { user: User | AdapterUser | null; loading: boolean } {

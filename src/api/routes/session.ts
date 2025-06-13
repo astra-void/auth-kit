@@ -5,7 +5,7 @@ import { verifyJWT } from "../../jwt";
 export async function GET(req: NextRequest, config: AuthKitParams) {
     try {
         const { adapter } = config;
-        const token = req.cookies.get('auth-token')?.value;
+        const token = req.cookies.get('auth-kit.session-token')?.value;
         const secret = process.env.AUTHKIT_SECRET;
 
         if (!token) {
@@ -25,7 +25,7 @@ export async function GET(req: NextRequest, config: AuthKitParams) {
             return NextResponse.json({ user: null }, { status: 200 });
         }
 
-        return NextResponse.json({ user }, { status: 200 });
+        return NextResponse.json({ user: { id: user.id, email: user.email } }, { status: 200 });
     } catch (error) {
         return NextResponse.json({ user: null }, { status: 200 });
     }

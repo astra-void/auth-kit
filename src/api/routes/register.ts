@@ -1,12 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AuthKitParams } from "../../core/types";
-import { hashPassword, verifyPassword } from "../../auth";
+import { hashPassword } from "../../auth";
 import { signJWT } from "../../jwt";
+import { CSRF_COOKIE_NAME, verifyCsrf } from "../../core";
 
 export async function POST(req: NextRequest, config: AuthKitParams) {  
     try {
         const { email, password } = await req.json();
         const { adapter, algorithm = 'bcrypt' } = config;
+
+        const headerToken = req.headers.get('x-csrf-token');
+        const cookieToken = req.cookies.get(CSRF_COOKIE_NAME)?.value;
+
+        if (!headerToken || !cookieToken || !verifyCsrf(req)) {
+            return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 })
+        };
 
         if (!email || !password) {
             return NextResponse.json({ error: 'Email and password are required.' }, { status: 400 });
@@ -27,7 +35,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
         });
 
         const res = NextResponse.json({ ok: true });
-        res.cookies.set('auth_token', token!, {
+        res.cookies.set('auth-kit.session-token', token!, {
             httpOnly: true,
             secure: true,
             path: '/',
