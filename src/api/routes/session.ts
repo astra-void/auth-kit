@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AuthKitParams } from "../../core/types";
 import { verifyJWT } from "../../jwt";
+import { getCookieName } from "../../jwt/utils";
 
 export async function GET(req: NextRequest, config: AuthKitParams) {
     try {
         const { adapter } = config;
-        const token = req.cookies.get('auth-kit.session-token')?.value;
+        const token = req.cookies.get(getCookieName('auth-kit.session-token'))?.value;
         const secret = process.env.AUTHKIT_SECRET;
 
         if (!token) {
