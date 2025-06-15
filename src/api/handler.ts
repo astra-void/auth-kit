@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { loginRoute, registerRoute, sessionRoute, csrfRoute } from "./routes";
+import { loginRoute, registerRoute, sessionRoute } from "./routes";
 import { AuthKitParams } from "../core/types";
 
 export function getHandler(params: AuthKitParams) {
@@ -19,8 +19,6 @@ export function getHandler(params: AuthKitParams) {
             switch (action) {
                 case 'session':
                     return sessionRoute(req, params);
-                case 'csrf':
-                    return csrfRoute(req);
             }
         }
 

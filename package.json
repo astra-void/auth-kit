@@ -1,7 +1,7 @@
 {
   "name": "@astra/auth-kit",
   "version": "0.1.0",
-  "description": "Lightweight authentication kit for Next.js",
+  "description": "Lightweight authentication kit for Next.js\nWIP",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -12,6 +12,11 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs",
       "types": "./dist/index.d.ts"
+    },
+    "./middleware": {
+      "import": "./dist/middleware/index.js",
+      "require": "./dist/middleware/index.cjs",
+      "types": "./dist/middleware/index.d.ts"
     },
     "./react": {
       "import": "./dist/react/index.js",
@@ -49,6 +54,7 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@noble/hashes": "^1.8.0",
     "@panva/hkdf": "^1.2.1",
     "argon2": "^0.43.0",
     "axios": "^1.9.0",

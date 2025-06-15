@@ -5,8 +5,10 @@ export async function login(params: LoginParams) {
     try {
         const { email, password } = params;
 
-        const { data } = await axios.get('/api/auth/csrf');
-        const csrfToken = data.csrfToken;
+        const csrfToken = getCsrfTokenFromCookie();
+        if (!csrfToken) {
+            throw new Error("CSRF token not found.");
+        }
 
         const req = await axios.post('/api/auth/login', 
             { email, password },
@@ -18,4 +20,21 @@ export async function login(params: LoginParams) {
     } catch (error) {
         return false;
     }
+}
+
+function getCsrfTokenFromCookie(): string | null {
+    if (typeof document === 'undefined') return null;
+
+    const possibleNames = ['auth-kit.csrf_token', '__Secure-auth-kit.csrf_token'];
+
+    for (const name of possibleNames) {
+        const cookie = document.cookie
+            .split('; ')
+            .find(row => row.startsWith(name + '='));
+        if (cookie) {
+            return decodeURIComponent(cookie.split('=')[1]);
+        }
+    }
+
+    return null;
 }

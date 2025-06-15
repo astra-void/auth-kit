@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { AuthKitParams } from "../../core/types";
 import { hashPassword } from "../../auth";
 import { signJWT } from "../../jwt";
-import { CSRF_COOKIE_NAME, verifyCsrf } from "../../core";
-import { getCookieName } from "../../jwt/utils";
+import { getCookieName } from "../../core/lib/cookie";
+import { CSRF_COOKIE_NAME, verifyCsrf } from "../../middleware/lib";
 
 export async function POST(req: NextRequest, config: AuthKitParams) {  
     try {

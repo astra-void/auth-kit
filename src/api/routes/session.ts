@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AuthKitParams } from "../../core/types";
 import { verifyJWT } from "../../jwt";
-import { getCookieName } from "../../jwt/utils";
+import { getCookieName } from "../../core/lib/cookie";
 
 export async function GET(req: NextRequest, config: AuthKitParams) {
     try {
