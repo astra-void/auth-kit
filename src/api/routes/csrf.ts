@@ -9,8 +9,9 @@ export async function GET(req: NextRequest) {
     res.cookies.set(getCookieName(CSRF_COOKIE_NAME), token, {
         httpOnly: false,
         sameSite: 'strict',
-        secure: true,
+        secure: process.env.NODE_ENV === 'production',
         path: '/',
+        maxAge: 60 * 10
     });
 
     return res;

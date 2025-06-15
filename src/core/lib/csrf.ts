@@ -19,6 +19,7 @@ export function verifyCsrf(req: NextRequest): boolean {
     const cookieToken = req.cookies.get(CSRF_COOKIE_NAME)?.value;
     const headerToken = req.headers.get('X-CSRF-Token');
     if (!cookieToken || !headerToken) return false;
+    if (cookieToken !== headerToken) return false;
 
     const [rawToken, timestamp, hmac] = cookieToken.split(':');
     if (!rawToken || !timestamp || !hmac) return false;

@@ -12,7 +12,6 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
         const headerToken = req.headers.get('X-CSRF-Token');
         const cookieToken = req.cookies.get(CSRF_COOKIE_NAME)?.value;
 
-        console.log(headerToken, cookieToken)
         if (!headerToken || !cookieToken || !verifyCsrf(req)) {
             return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 })
         };
