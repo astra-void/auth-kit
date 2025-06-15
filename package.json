@@ -1,7 +1,7 @@
 {
   "name": "@astra-void/auth-kit",
-  "version": "0.1.0-alpha.1",
-  "description": "Lightweight authentication kit for Next.js\nWIP",
+  "version": "0.1.0-alpha.2",
+  "description": "Lightweight authentication kit for Next.js",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [

@@ -1,7 +1,9 @@
 import axios from "axios";
 import { LoginParams } from "./types";
+import { User } from "./hooks";
+import { AdapterUser } from "../adapter";
 
-export async function login(params: LoginParams) {
+export async function login(params: LoginParams): Promise<User | AdapterUser | null> {
     try {
         const { email, password } = params;
 
@@ -18,7 +20,8 @@ export async function login(params: LoginParams) {
 
         return req.data;
     } catch (error) {
-        return false;
+        console.log(error);
+        return null;
     }
 }
 

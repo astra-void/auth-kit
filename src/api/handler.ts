@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { loginRoute, registerRoute, sessionRoute } from "./routes";
+import { loginRoute, logoutRoute, registerRoute, sessionRoute } from "./routes";
 import { AuthKitParams } from "../core/types";
 
 export function getHandler(params: AuthKitParams) {
@@ -12,6 +12,8 @@ export function getHandler(params: AuthKitParams) {
             switch (action) {
                 case 'login':
                     return loginRoute(req, params);
+                case 'logout':
+                    return logoutRoute(req);
                 case 'register':
                     return registerRoute(req, params);
             }
