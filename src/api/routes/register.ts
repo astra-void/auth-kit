@@ -6,7 +6,7 @@ import { getCookieName } from "../../core/lib/cookie";
 
 export async function POST(req: NextRequest, config: AuthKitParams) {  
     try {
-        const { email, password } = await req.json();
+        const { email, password, redirectTo } = await req.json();
         const { adapter, algorithm = 'argon2' } = config;
 
         if (!email || !password) {
@@ -27,7 +27,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
             secret: process.env.AUTHKIT_SECRET!,
         });
 
-        const res = NextResponse.json({ ok: true });
+        const res = NextResponse.json({ ok: true, redirectTo: redirectTo ?? '/' });
         res.cookies.set(getCookieName('auth-kit.session-token'), token!, {
             httpOnly: true,
             secure: true,
