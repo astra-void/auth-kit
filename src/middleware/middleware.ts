@@ -12,12 +12,14 @@ export function AuthKitMiddleware(config: MiddlewareParams) {
         const {
             loginPath = '/login',
             logoutPath = '/logout',
+            registerPath = '/register',
             protectedRoutes = [],
         } = config;
 
         const needCsrfToken = 
             pathname === loginPath || 
             pathname === logoutPath ||
+            pathname === registerPath ||
             protectedRoutes.some(route => pathname.startsWith(route));
 
         if (!needCsrfToken) return NextResponse.next();

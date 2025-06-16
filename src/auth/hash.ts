@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import argon2 from "argon2";
 import { HashingAlgorithm } from ".";
 
-export async function hashPassword(password: string, algorithm: HashingAlgorithm = 'bcrypt') {
+export async function hashPassword(password: string, algorithm: HashingAlgorithm = 'argon2') {
     switch (algorithm) {
         case 'bcrypt':
             return bcrypt.hash(password, 10);
@@ -11,7 +11,7 @@ export async function hashPassword(password: string, algorithm: HashingAlgorithm
     }
 }
 
-export async function verifyPassword(password: string, hash: string, algorithm: HashingAlgorithm = 'bcrypt') {
+export async function verifyPassword(password: string, hash: string, algorithm: HashingAlgorithm = 'argon2') {
     switch (algorithm) {
         case 'bcrypt':
             return bcrypt.compare(password, hash)

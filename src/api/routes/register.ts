@@ -3,11 +3,19 @@ import { AuthKitParams } from "../../core/types";
 import { hashPassword } from "../../auth";
 import { signJWT } from "../../jwt";
 import { getCookieName } from "../../core/lib/cookie";
+import { CSRF_COOKIE_NAME, verifyCsrf } from "../../middleware/lib";
 
-export async function POST(req: NextRequest, config: AuthKitParams) {  
+export async function POST(req: NextRequest, config: AuthKitParams) {
     try {
-        const { email, password, redirectTo } = await req.json();
+        const { email, password } = await req.json();
         const { adapter, algorithm = 'argon2' } = config;
+
+        const headerToken = req.headers.get('X-CSRF-Token');
+        const cookieToken = req.cookies.get(CSRF_COOKIE_NAME)?.value;
+
+        if (!headerToken || !cookieToken || !verifyCsrf(req)) {
+            return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 })
+        };
 
         if (!email || !password) {
             return NextResponse.json({ error: 'Email and password are required.' }, { status: 400 });
@@ -27,7 +35,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
             secret: process.env.AUTHKIT_SECRET!,
         });
 
-        const res = NextResponse.redirect(redirectTo ?? '/');
+        const res = NextResponse.json({ ok: true });
         res.cookies.set(getCookieName('auth-kit.session-token'), token!, {
             httpOnly: true,
             secure: true,

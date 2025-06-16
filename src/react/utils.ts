@@ -1,7 +1,7 @@
 export function getCsrfTokenFromCookie(): string | null {
     if (typeof document === 'undefined') return null;
 
-    const possibleNames = ['auth-kit.csrf_token', '__Secure-auth-kit.csrf_token'];
+    const possibleNames = ['auth-kit.csrf-token', '__Secure-auth-kit.csrf-token'];
 
     for (const name of possibleNames) {
         const cookie = document.cookie

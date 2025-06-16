@@ -6,7 +6,7 @@ import { getCsrfTokenFromCookie } from "./utils";
 
 export async function login(params: LoginParams): Promise<User | AdapterUser | null> {
     try {
-        const { email, password } = params;
+        const { email, password, redirect = true, redirectUrl = '/' } = params;
 
         const csrfToken = getCsrfTokenFromCookie();
         if (!csrfToken) {
@@ -18,6 +18,11 @@ export async function login(params: LoginParams): Promise<User | AdapterUser | n
             { headers: {
                 'X-CSRF-Token' : csrfToken
             } });
+
+        if (redirect) {
+            window.location.href = redirectUrl
+            return null;
+        }
 
         return req.data;
     } catch (error) {
