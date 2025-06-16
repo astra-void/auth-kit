@@ -60,7 +60,7 @@ export interface Adapter {
 }
 ```
 
-The User interface should be like
+### The User interface should be like
 ```ts
 export interface User {
     id: string;
