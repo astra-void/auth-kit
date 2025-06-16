@@ -10,13 +10,14 @@ export function AuthKitMiddleware(config: MiddlewareParams) {
     return function middleware(req: NextRequest) {
         const { pathname } = req.nextUrl;
         const {
+            alwaysSetToken = false,
             loginPath = '/login',
             logoutPath = '/logout',
             registerPath = '/register',
             protectedRoutes = [],
         } = config;
 
-        const needCsrfToken = 
+        const needCsrfToken = alwaysSetToken ||
             pathname === loginPath || 
             pathname === logoutPath ||
             pathname === registerPath ||
@@ -24,14 +25,15 @@ export function AuthKitMiddleware(config: MiddlewareParams) {
 
         if (!needCsrfToken) return NextResponse.next();
 
-        const existingToken = req.cookies.get(getCookieName(CSRF_COOKIE_NAME));
+        const cookieName = getCookieName(CSRF_COOKIE_NAME);
+        const existingToken = req.cookies.get(cookieName);
         if (existingToken) {
             return NextResponse.next();
         }
 
         const token = generateCsrfToken();
         const res = NextResponse.next();
-        res.cookies.set(getCookieName(CSRF_COOKIE_NAME), token, {
+        res.cookies.set(cookieName, token, {
             httpOnly: false,
             sameSite: 'strict',
             secure: isProduction,
