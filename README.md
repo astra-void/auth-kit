@@ -102,6 +102,7 @@ import { AuthKitMiddleware } from "@astra-void/auth-kit/middleware";
 const middleware = AuthKitMiddleware({
   loginPath: '/login', // default: '/login'
   logoutPath: '/logout', // default: '/logout'
+  registerPath: '/register', // default: '/register'
   protectedRoutes: ['dashboard'], // protect routes
 });
 
@@ -118,6 +119,22 @@ export { middleware };
 import { login } from '@astra-void/auth-kit/react';
 
 await login({ email: 'test@example.com', password: '12345678' });
+```
+
+### Logout
+
+```ts
+import { logout } from '@astra-void/auth-kit/react';
+
+await logout();
+```
+
+### Register
+
+```ts
+import { register } from '@astra-void/auth-kit/react';
+
+await register({ email: 'test@example.com', password: '12345678' });
 ```
 
 ### Session Hook
