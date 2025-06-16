@@ -4,6 +4,7 @@ import { getCookieName } from "../../core/lib/cookie";
 
 export async function POST(req: NextRequest) {
     try {
+        const { redirectTo } = await req.json();
         const headerToken = req.headers.get('X-CSRF-Token');
         const cookieToken = req.cookies.get(CSRF_COOKIE_NAME)?.value;
 
@@ -18,7 +19,7 @@ export async function POST(req: NextRequest) {
 
         req.cookies.delete(getCookieName('auth-kit.session-token'));
 
-        return NextResponse.json({ message: "Logged out", success: true }, { status: 200 });
+        const res = NextResponse.redirect(redirectTo ?? "/");
     } catch (error) {
         return NextResponse.json({ error, success: false }, { status: 500 });
     }

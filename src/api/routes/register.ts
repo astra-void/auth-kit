@@ -27,7 +27,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
             secret: process.env.AUTHKIT_SECRET!,
         });
 
-        const res = NextResponse.json({ ok: true, redirectTo: redirectTo ?? '/' });
+        const res = NextResponse.redirect(redirectTo ?? '/');
         res.cookies.set(getCookieName('auth-kit.session-token'), token!, {
             httpOnly: true,
             secure: true,
