@@ -13,7 +13,7 @@ export async function register(params: RegisterParams): Promise<User | AdapterUs
             throw new Error("CSRF token not found.");
         }
 
-        const req = await axios.post('/api/auth/logout', { email, password }, {
+        const req = await axios.post('/api/auth/register', { email, password }, {
             headers: {
                 'X-CSRF-Token' : csrfToken,
             }
