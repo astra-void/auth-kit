@@ -18,7 +18,7 @@ export function useSession(): { user: User | AdapterUser | null; loading: boolea
                         setUser(data.user ?? null);
                     }
                 });
-            } catch (error) {
+            } catch {
                 if (isMounted) {
                     setUser(null);
                 }

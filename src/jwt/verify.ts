@@ -13,7 +13,7 @@ export async function verifyJWT({
         const encryptionKey = await getEncryptionKey(secret, salt);
         const { payload } = await jwtDecrypt(token, encryptionKey, { clockTolerance: 15 });
         return payload; 
-    } catch (error) {
+    } catch {
         return null;
     }
 }

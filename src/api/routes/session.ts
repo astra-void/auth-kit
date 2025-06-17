@@ -27,7 +27,7 @@ export async function GET(req: NextRequest, config: AuthKitParams) {
         }
 
         return NextResponse.json({ user: { id: user.id, email: user.email } }, { status: 200 });
-    } catch (error) {
+    } catch {
         return NextResponse.json({ user: null }, { status: 200 });
     }
 }

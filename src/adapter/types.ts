@@ -1,8 +1,6 @@
 import { User } from "../react/hooks/types";
 
-export interface AdapterUser extends User {
-    
-}
+export type AdapterUser = User
 
 export interface Adapter {
     createUser?: (email: string, hashedPassword: string) => Promise<AdapterUser>;

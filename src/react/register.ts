@@ -24,7 +24,7 @@ export async function register(params: RegisterParams): Promise<User | AdapterUs
         }
 
         return req.data;
-    } catch (error) {
+    } catch {
         return null;
     }
 }

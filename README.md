@@ -23,7 +23,7 @@ pnpm add @astra-void/auth-kit
 
 Set up your project like this:
 
-```
+```md
 📂 your-nextjs-app
 │ app/
 │  └─ api/
