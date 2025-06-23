@@ -17,7 +17,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
 
         console.log(user, passkey);
 
-        if (!user || !passkey || !user.passkeys || user.passkeys?.length === 0) {
+        if (!user || !passkey || !user.passkeys) {
             return NextResponse.json({ error: "User not found or no passkeys registered" }, { status: 404 });
         }
 
