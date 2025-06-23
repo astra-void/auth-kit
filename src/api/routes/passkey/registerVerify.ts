@@ -6,8 +6,8 @@ import { getSession } from "../../../auth/lib/session";
 
 function decodeBase64Url(input: string): Uint8Array {
     const base64 = input.replace(/-/g, "+").replace(/_/g, "/");
-    const binary = atob(base64);
-    return Uint8Array.from(binary, (char) => char.charCodeAt(0));
+    const binary = Buffer.from(base64, "base64");
+    return new Uint8Array(binary);
 }
 
 export async function POST(req: NextRequest, config: AuthKitParams) {

@@ -102,7 +102,7 @@ export function PrismaAdapter(prisma: any): Adapter {
     createPasskey: async (userId, webAuthnId, publicKey, transports) => {
       const passkey = await prisma.passkey.create({
         data: {
-          userID: userId,
+          userId,
           webAuthnId,
           publicKey,
           transports,
