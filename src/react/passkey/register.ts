@@ -11,15 +11,24 @@ export async function registerPasskey() {
         }
         
         const options = (await axios.post('/api/auth/register/passkey/options', { userId: session?.id })).data.options;
-        console.log(options);
         
         let attResp;
         try {
             attResp = await startRegistration({ optionsJSON: options });
-            console.log("Registration response:", attResp);
         } catch (error) {
             console.error("Error during registration:", error);
             return;
+        }
+
+        const userId = Buffer.from(options.user.id, "base64").toString();
+
+        const verifyResponse = await axios.post('/api/auth/register/passkey/verify', {
+            userId,
+            credential: attResp,
+        });
+
+        if (verifyResponse.data.verified) {
+            console.log("Registration successful!");
         }
         
     } catch (error) {
