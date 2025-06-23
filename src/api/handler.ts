@@ -1,26 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
-import { loginRoute, logoutRoute, registerRoute, sessionRoute } from "./routes";
+import * as routes from "./routes";
 import { AuthKitParams } from "../core/types";
 
 export function getHandler(params: AuthKitParams) {
     return async function handler(req: NextRequest) {
         const { pathname } = new URL(req.url);
-        const segments = pathname.replace(/\/$/, '').split('/');
-        const action = segments.at(-1);
+      
+        const basePath = "/api/auth";
+        
+        const cleanPath = pathname
+            .replace(new RegExp(`^${basePath}`), "")
+            .replace(/^\/+|\/+$/g, "");
 
         if (req.method === 'POST') {
-            switch (action) {
+            switch (cleanPath) {
                 case 'login':
-                    return loginRoute(req, params);
+                    return routes.loginRoute(req, params);
                 case 'logout':
-                    return logoutRoute(req);
+                    return routes.logoutRoute(req);
                 case 'register':
-                    return registerRoute(req, params);
-            }
+                    return routes.registerRoute(req, params);
+                case 'login/passkey/options':
+                    return routes.loginOptionsRoute(req, params);
+                case 'login/passkey/verify':
+                    return routes.loginVerifyRoute(req, params);
+                case 'register/passkey/options':
+                    return routes.registerOptionsRoute(req, params);
+                case 'register/passkey/verify':
+                    return routes.registerVerify(req, params);
+                default:
+                    return NextResponse.json({ error: 'Endpoint not found', method: "POST", path: cleanPath }, { status: 404 });
+                }
         } else if (req.method === 'GET') {
-            switch (action) {
+            switch (cleanPath) {
                 case 'session':
-                    return sessionRoute(req, params);
+                    return routes.sessionRoute(req, params);
+                default:
+                    return NextResponse.json({ error: 'Endpoint not found', method: "POST", path: cleanPath }, { status: 404 });
             }
         }
 

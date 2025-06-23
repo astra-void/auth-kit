@@ -7,9 +7,8 @@ import markdown from "@eslint/markdown";
 import css from "@eslint/css";
 import { defineConfig } from "eslint/config";
 
-
 export default defineConfig([
-  { files: ["**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"], plugins: { js }, ...js.configs.recommended },
+  { files: ["**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"], plugins: { js }, ...js.configs.recommended, },
   { files: ["**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"], languageOptions: { globals: globals.browser } },
   { files: ["**/*.{jsx,tsx}"], plugins: { react: pluginReact }, ...pluginReact.configs.flat.recommended },
   ...tseslint.configs.recommended,
@@ -26,6 +25,6 @@ export default defineConfig([
     }
   },
   {
-    ignores: ["dist/**", "**/*.js"]
+    ignores: ["dist/**", "**/*.js"],
   }
 ]);
