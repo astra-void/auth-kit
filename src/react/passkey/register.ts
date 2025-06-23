@@ -10,7 +10,7 @@ export async function registerPasskey() {
             throw Error("Session not found")
         }
         
-        const options = (await axios.post('/api/auth/register/passkey/options', { userId: session?.id })).data;
+        const options = (await axios.post('/api/auth/register/passkey/options', { userId: session?.id })).data.options;
         console.log(options);
         
         let attResp;

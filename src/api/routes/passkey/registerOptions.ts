@@ -21,6 +21,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
             rpID: config.passkey.rpId,
             userID: new TextEncoder().encode(user.id),
             userName: user.username ?? user.email ?? "unknown-user",
+            userDisplayName: user.username ?? user.email ?? "unknown-user",
             timeout: 60000,
             attestationType: "none",
             authenticatorSelection: {
