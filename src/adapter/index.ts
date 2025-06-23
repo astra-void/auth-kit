@@ -1,2 +1,2 @@
-//export * from "./prisma";
+export { PrismaAdapter } from "./prisma";
 export * from "./types";
