@@ -17,7 +17,7 @@ export async function registerPasskey() {
             return;
         }
         
-    } catch {
-        console.log("Error during registering passkey options")
+    } catch (error) {
+        console.log("Error during registering passkey options: ", error);
     }
 }
