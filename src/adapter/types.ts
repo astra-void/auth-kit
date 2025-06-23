@@ -24,6 +24,6 @@ export interface Adapter {
     createPasskey?: (userId: string, webAuthnId: Buffer, publicKey: Buffer, transports: string) => Promise<Passkey>;
     getPasskey?: (userId: string) => Promise<Passkey[] | null>;
     getPasskeyByEmail?: (email: string) => Promise<Passkey[] | null>;
-    updatePasskey?: (userId: string, data: Partial<Passkey>) => Promise<Passkey>;
+    updatePasskey?: (email: string, data: Partial<Passkey>) => Promise<Passkey>;
     deletePasskey?: (userId: string) => Promise<null>;
 }

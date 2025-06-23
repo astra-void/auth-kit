@@ -120,9 +120,9 @@ export function PrismaAdapter(prisma: any): Adapter {
       }));
     },
 
-    updatePasskey: async (userId, data) => {
+    updatePasskey: async (email, data) => {
       const passkey = await prisma.passkey.update({
-        where: { id: userId },
+        where: { email },
         data: {
           ...data,
           updatedAt: new Date(),
