@@ -43,7 +43,6 @@ export function PrismaAdapter(prisma: any): Adapter {
     getUserByEmail: async (email) => {
       const user = await prisma.user.findUnique({
         where: { email },
-        // passkeys 미포함
       });
       return user ? mapUser(user) : null;
     },
