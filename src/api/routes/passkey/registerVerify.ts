@@ -36,7 +36,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
         }
 
         if (!expectedChallenge) {
-            return NextResponse.json({ error: "No stored challenge" }, { status: 400 });
+            return NextResponse.json({ error: "Challenge not found" }, { status: 400 });
         }
 
         let verified = false;

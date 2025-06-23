@@ -33,7 +33,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
 
         await storeChallenge(email, options.challenge);
 
-        return NextResponse.json(options, { status: 200 });
+        return NextResponse.json({ options }, { status: 200 });
     } catch (error) {
         console.error("[INTERNAL ERROR]", error);
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });
