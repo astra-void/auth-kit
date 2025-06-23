@@ -3,7 +3,7 @@
 [![npm](https://img.shields.io/npm/v/@astra-void/auth-kit)](https://www.npmjs.com/package/@astra-void/auth-kit)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-> Lightweight authentication kit for Next.js
+> Next.js authentication with passkey support
 > **Still developing – subject to change**
 
 ---
