@@ -23,6 +23,6 @@ export interface Adapter {
     deleteUser?: (userId: string) => Promise<null>;
     getPasskey?: (userId: string) => Promise<Passkey | null>;
     getPasskeyByEmail?: (email: string) => Promise<Passkey | null>;
-    createPasskey?: (userId: string, webAuthnID: Uint8Array, publicKey: Buffer, transports: string) => Promise<Passkey>;
+    createPasskey?: (userId: string, webAuthnID: Buffer, publicKey: Buffer, transports: string) => Promise<Passkey>;
     deletePasskey?: (userId: string) => Promise<null>;
 }
