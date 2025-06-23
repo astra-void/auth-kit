@@ -4,9 +4,13 @@ import { startRegistration } from "@simplewebauthn/browser";
 
 export async function registerPasskey() {
     try {
-        const session = getSession();
+        const session = await getSession();
+
+        if (!session) {
+            throw Error("Session not found")
+        }
         
-        const options = (await axios.post('/api/auth/register/passkey/options', { userId: session.user?.id })).data;
+        const options = (await axios.post('/api/auth/register/passkey/options', { userId: session?.id })).data;
 
         let attResp;
         try {
