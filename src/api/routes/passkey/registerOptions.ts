@@ -2,19 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { AuthKitParams } from "../../../core/types";
 import { generateRegistrationOptions } from "@simplewebauthn/server";
 import { storeRegistrationChallenge } from "../../../core/lib/challenge";
+import { getSession } from "../../../auth/lib/session";
 
 export async function POST(req: NextRequest, config: AuthKitParams) {
     try {
-        const { userId } = await req.json();
-
         if (!config.passkey?.rpId || !config.passkey.rpName) {
             return NextResponse.json({ error: "rpId and rpName is required" });
         }
 
-        const user = await config.adapter.getUser?.(userId);
+        const user = await getSession(config)
 
         if (!user) {
-            return NextResponse.json({ success: false, message: "User not found" }, { status: 404 });
+            return NextResponse.json({ success: false, message: "Not logged in" }, { status: 404 });
         }
 
         const options = await generateRegistrationOptions({
@@ -32,7 +31,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
         });
 
         if (config.passkey.store === 'memory') {
-            storeRegistrationChallenge(userId, options.challenge);
+            storeRegistrationChallenge(user.id, options.challenge);
         }
 
         return NextResponse.json({ options }, { status: 200 });

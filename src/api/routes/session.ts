@@ -9,10 +9,7 @@ export async function GET(req: NextRequest, config: AuthKitParams) {
         const token = req.cookies.get(getCookieName('auth-kit.session-token'))?.value;
         const secret = process.env.AUTHKIT_SECRET;
 
-        if (!token) {
-            return NextResponse.json({ user: null }, { status: 200 });
-        }
-        if (!secret) {
+        if (!token || !secret) {
             return NextResponse.json({ user: null }, { status: 200 });
         }
 
