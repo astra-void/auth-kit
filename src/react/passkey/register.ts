@@ -1,10 +1,10 @@
 import axios from "axios";
-import { useSession } from "../hooks"
+import { getSession } from "./getSession";
 import { startRegistration } from "@simplewebauthn/browser";
 
 export async function registerPasskey() {
     try {
-        const session = useSession();
+        const session = getSession();
         
         const options = (await axios.post('/api/auth/register/passkey/options', { userId: session.user?.id })).data;
 
