@@ -15,6 +15,8 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
         const user = await adapter.getUserByEmail?.(email);
         const passkey = await adapter.getPasskeyByEmail?.(email);
 
+        console.log(user, passkey);
+
         if (!user || !passkey || !user.passkeys || user.passkeys?.length === 0) {
             return NextResponse.json({ error: "User not found or no passkeys registered" }, { status: 404 });
         }
