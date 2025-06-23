@@ -15,7 +15,7 @@ export async function loginPasskey(email: string) {
 
         //const credential = await startAuthentication({ optionsJSON: options });
 
-    } catch {
-        console.log("Error during login passkey options");
+    } catch (error) {
+        console.log("Error during login passkey options: ", error);
     }
 }
