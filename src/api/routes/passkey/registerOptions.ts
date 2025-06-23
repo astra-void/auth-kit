@@ -11,7 +11,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
             return NextResponse.json({ error: "rpId and rpName is required" });
         }
 
-        const user = await config.adapter.getUserByEmail?.(userId);
+        const user = await config.adapter.getUser?.(userId);
 
         if (!user) {
             return NextResponse.json({ success: false, message: "User not found" }, { status: 404 });
