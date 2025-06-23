@@ -1,6 +1,6 @@
 {
   "name": "@astra-void/auth-kit",
-  "version": "0.1.5",
+  "version": "0.2.0-alpha.1",
   "description": "Lightweight authentication kit for Next.js",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -50,9 +50,8 @@
   "peerDependencies": {
     "next": "^15.3.3",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
-  },
-  "optionalDependencies": {
+    "react-dom": "^19.1.0",
+    "argon2": "^0.43.0",
     "bcrypt": "^6.0.0"
   },
   "devDependencies": {
@@ -85,7 +84,6 @@
     "@simplewebauthn/browser": "^13.1.0",
     "@simplewebauthn/server": "^13.1.1",
     "axios": "^1.10.0",
-    "argon2": "^0.43.0",
     "jose": "^6.0.11",
     "uuid": "^11.1.0"
   }
