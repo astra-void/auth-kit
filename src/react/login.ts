@@ -25,8 +25,7 @@ export async function login(params: LoginParams): Promise<User | AdapterUser | n
         }
 
         return req.data;
-    } catch (error) {
-        console.log(error);
+    } catch {
         return null;
     }
 }

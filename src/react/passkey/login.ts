@@ -12,7 +12,7 @@ export async function loginPasskey(params: LoginPasskeyParams) {
             throw Error("Already logged in")
         }
 
-        const options = (await axios.post('/api/auth/login/passkey/options', { email })).data;
+        const options = (await axios.post('/api/auth/login/passkey/options', { email })).data.options;
 
         const credential = await startAuthentication({ optionsJSON: options });
 
@@ -28,7 +28,7 @@ export async function loginPasskey(params: LoginPasskeyParams) {
             return false;
         }
 
-    } catch (error) {
-        console.log("Error during login passkey options: ", error);
+    } catch {
+        return false;
     }
 }

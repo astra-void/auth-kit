@@ -22,8 +22,7 @@ export async function logout(params: LogoutParams = {}) {
         }
 
         return req.data;
-    } catch (error) {
-        console.log(error);
+    } catch {
         return false;
     }
 }

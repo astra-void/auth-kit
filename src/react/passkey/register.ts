@@ -28,6 +28,6 @@ export async function registerPasskey() {
         }
         
     } catch {
-        console.log("Error during registering passkey options");
+        return false;
     }
 }

@@ -19,7 +19,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
 
         const expectedChallenge = await getChallenge(email);
 
-        if (!user || !passkey || user.passkeys?.length === 0) {
+        if (!user || !passkey || passkey.length === 0) {
             return NextResponse.json({ error: "User not found or no passkeys registered" }, { status: 404 });
         }
 
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
         const incomingID = Buffer.from(credential.id, "base64url");
         let dbPasskey = null;
 
-        for (const p of user.passkeys!) {
+        for (const p of passkey) {
             const savedID = typeof p.webAuthnId === "string"
                 ? Buffer.from(p.webAuthnId, "base64url")
                 : Buffer.from(p.webAuthnId);
@@ -82,7 +82,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
                 },
                 secret: process.env.AUTHKIT_SECRET!,
             });
-            const res = NextResponse.json({ ok: true });
+            const res = NextResponse.json({ success: true });
             res.cookies.set(getCookieName('auth-kit.session-token'), token!, {
                 httpOnly: true,
                 secure: true,

@@ -101,14 +101,17 @@ export function PrismaAdapter(prisma: any): Adapter {
     },
 
     getPasskeyByEmail: async (email) => {
-      const user = await prisma.user.findUnique({
+      const user: AdapterUser = await prisma.user.findUnique({
         where: { email },
-        include: { passkeys: true },
       });
+      if (!user) return null;
 
-      if (!user || !user.passkeys.length) return null;
+      const passkeys = await prisma.passkey.findMany({
+        where: { userId: user.id }
+      });
+      if (passkeys.length === 0) return null;
 
-      return user.passkeys.map((p: Passkey) => ({
+      return passkeys?.map((p: Passkey) => ({
         id: p.id,
         publicKey: p.publicKey,
         userId: p.userId,

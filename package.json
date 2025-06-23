@@ -1,7 +1,7 @@
 {
   "name": "@astra-void/auth-kit",
-  "version": "0.2.0-alpha.27",
-  "description": "Lightweight authentication kit for Next.js",
+  "version": "0.2.0",
+  "description": "Next.js authentication with passkey support",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -43,16 +43,25 @@
   "keywords": [
     "jwt",
     "authkit",
-    "nextjs"
+    "nextjs",
+    "passkey",
+    "authentication",
+    "login",
+    "register",
+    "webauthn",
+    "auth",
+    "session",
+    "prisma",
+    "react"
   ],
   "author": "astra-void",
   "license": "MIT",
   "peerDependencies": {
+    "argon2": "^0.43.0",
+    "bcrypt": "^6.0.0",
     "next": "^15.3.3",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "argon2": "^0.43.0",
-    "bcrypt": "^6.0.0"
+    "react-dom": "^19.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.27.4",
@@ -76,7 +85,7 @@
     "ts-node": "^10.9.2",
     "tsup": "^8.5.0",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.34.1"
+    "typescript-eslint": "^8.35.0"
   },
   "dependencies": {
     "@noble/hashes": "^1.8.0",

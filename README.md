@@ -1,7 +1,7 @@
 # @astra-void/auth-kit
 
 > Lightweight authentication kit for Next.js
-> **Alpha version – subject to change**
+> ** Still devloping – subject to change**
 
 ---
 
