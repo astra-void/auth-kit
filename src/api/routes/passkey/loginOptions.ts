@@ -15,13 +15,11 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
         const user = await adapter.getUserByEmail?.(email);
         const passkey = await adapter.getPasskeyByEmail?.(email);
 
-        console.log(user, passkey);
-
-        if (!user || !passkey || !user.passkeys) {
+        if (!user || !passkey || user.passkeys?.length === 0) {
             return NextResponse.json({ error: "User not found or no passkeys registered" }, { status: 404 });
         }
 
-        const allowCredentials = user.passkeys.map((p) => ({
+        const allowCredentials = user.passkeys?.map((p) => ({
             id: Buffer.from(p.webAuthnId).toString("base64url"),
             transports: p.transports.split(",") as AuthenticatorTransport[],
         }));
