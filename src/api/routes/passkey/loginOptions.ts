@@ -19,7 +19,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
             return NextResponse.json({ error: "User not found or no passkeys registered" }, { status: 404 });
         }
 
-        const allowCredentials = user.passkeys?.map((p) => ({
+        const allowCredentials = passkey.map((p) => ({
             id: Buffer.from(p.webAuthnId).toString("base64url"),
             transports: p.transports.split(",") as AuthenticatorTransport[],
         }));
