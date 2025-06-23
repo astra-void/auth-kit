@@ -1,5 +1,5 @@
-import bcrypt from "bcrypt";
 import argon2 from "argon2";
+import bcrypt from "bcrypt";
 import { HashingAlgorithm } from ".";
 
 export async function hashPassword(password: string, algorithm: HashingAlgorithm = 'argon2') {
