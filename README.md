@@ -1,5 +1,8 @@
 # @astra-void/auth-kit
 
+[![npm](https://img.shields.io/npm/v/@astra-void/auth-kit)](https://www.npmjs.com/package/@astra-void/auth-kit)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 > Lightweight authentication kit for Next.js
 > **Still developing – subject to change**
 
@@ -57,20 +60,45 @@ export { handler as GET, handler as POST };
 ### Adapter Types
 ```ts
 export interface Adapter {
-    createUser?: (email: string, hashedPassword: string) => Promise<AdapterUser>;
-    getUser?: (id: string) => Promise<AdapterUser>;
+    createUser?: (email: string, hashedPassword: string, username?: string) => Promise<AdapterUser>;
+    getUser?: (id: string) => Promise<AdapterUser | null>;
     getUserByEmail?: (email: string) => Promise<AdapterUser | null>;
-    updateUser?: (user: AdapterUser) => Promise<AdapterUser>;
+    updateUser?: (userId: string, data: Partial<AdapterUser>) => Promise<AdapterUser>;
     deleteUser?: (userId: string) => Promise<null>;
+    createPasskey?: (userId: string, webAuthnId: Buffer, publicKey: Buffer, transports: string) => Promise<Passkey>;
+    getPasskey?: (userId: string) => Promise<Passkey[] | null>;
+    getPasskeyByEmail?: (email: string) => Promise<Passkey[] | null>;
+    updatePasskey?: (passkeyId: string, data: Partial<Passkey>) => Promise<Passkey>;
+    deletePasskey?: (userId: string) => Promise<null>;
 }
 ```
 
-### The User interface
+### User interface
 ```ts
 export interface User {
     id: string;
     email?: string;
     hashedPassword?: string;
+    createdAt: Date;
+    updatedAt: Date;
+}
+```
+also Adapter User interface
+```ts
+export interface AdapterUser extends User {
+    passkeys?: Passkey[]
+}
+```
+
+### Passkey interface 
+```ts
+export interface Passkey {
+    id: string;
+    publicKey: Buffer;
+    userId: string;
+    webAuthnId: Buffer;
+    counter: number;
+    transports: string;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -84,6 +112,34 @@ const handler = AuthKit({
     adapter: PrismaAdapter(prisma),
 });
 ```
+
+#### Prisma schema for default Prisma Adapter
+```ts
+model User {
+  id             String    @id @default(uuid())
+  email          String    @unique
+  hashedPassword String
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  passkeys       Passkey[]
+}
+
+model Passkey {
+  id         String   @id @default(uuid())
+  publicKey  Bytes
+  userId     String
+  webAuthnId Bytes    @unique
+  counter    Int      @default(0)
+  transports String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+```
++ This Prisma schema is written for SQL-based databases (e.g. PostgreSQL, MySQL).
 
 ### Use passkey for login
 ```ts
