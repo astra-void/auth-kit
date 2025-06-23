@@ -36,7 +36,8 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
         }
 
         return NextResponse.json({ options }, { status: 200 });
-    } catch {
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    } catch (error) {
+        console.error("[INTERNAL ERROR]", error);
+        return NextResponse.json({ error: "Internal server error" }, { status: 500 });
     }
 }

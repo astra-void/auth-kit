@@ -4,7 +4,8 @@ import { AuthKitParams } from "../../../core/types";
 export async function POST(req: NextRequest, config: AuthKitParams) {
     try {
         return;
-    } catch {
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    } catch (error) {
+        console.error("[INTERNAL ERROR]", error);
+        return NextResponse.json({ error: "Internal server error" }, { status: 500 });
     }
 }

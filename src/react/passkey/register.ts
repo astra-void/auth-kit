@@ -15,8 +15,7 @@ export async function registerPasskey() {
         let attResp;
         try {
             attResp = await startRegistration({ optionsJSON: options });
-        } catch (error) {
-            console.error("Error during registration:", error);
+        } catch {
             return;
         }
 
@@ -25,10 +24,10 @@ export async function registerPasskey() {
         });
 
         if (verifyResponse.data.verified) {
-            console.log("Registration successful!");
+            return true;
         }
         
-    } catch (error) {
-        console.log("Error during registering passkey options: ", error);
+    } catch {
+        console.log("Error during registering passkey options");
     }
 }
