@@ -8,6 +8,8 @@
 ## Security Note
 ⚠️ This library handles sensitive authentication logic. Please review and test carefully before using in production.
 
+---
+
 ## 🚀 Getting Started
 
 ### 1. Install
