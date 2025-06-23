@@ -13,7 +13,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
         const user = await getSession(config)
 
         if (!user) {
-            return NextResponse.json({ success: false, message: "Not logged in" }, { status: 404 });
+            return NextResponse.json({ success: false, message: "Not logged in" }, { status: 401 });
         }
 
         const options = await generateRegistrationOptions({

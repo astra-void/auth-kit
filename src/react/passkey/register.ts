@@ -11,7 +11,8 @@ export async function registerPasskey() {
         }
         
         const options = (await axios.post('/api/auth/register/passkey/options', { userId: session?.id })).data;
-
+        console.log(options);
+        
         let attResp;
         try {
             attResp = await startRegistration({ optionsJSON: options });
