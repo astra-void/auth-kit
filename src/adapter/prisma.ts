@@ -26,10 +26,10 @@ function mapUser(user: AdapterUser): AdapterUser {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function PrismaAdapter(prisma: any): Adapter {
   return {
-    createUser: async (email, hashedPassword) => {
-      const user = await prisma.user.create({
-        data: { email, password: hashedPassword, username: email },
-      });
+    createUser: async (email, hashedPassword, username) => {
+      const data: { email: string; hashedPassword: string; username?: string } = { email, hashedPassword };
+      if (username) data.username = username;
+      const user = await prisma.user.create({ data })
       return mapUser(user);
     },
 

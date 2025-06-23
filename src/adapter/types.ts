@@ -16,7 +16,7 @@ export interface Passkey {
 }
 
 export interface Adapter {
-    createUser?: (email: string, hashedPassword: string) => Promise<AdapterUser>;
+    createUser?: (email: string, hashedPassword: string, username?: string) => Promise<AdapterUser>;
     getUser?: (id: string) => Promise<AdapterUser | null>;
     getUserByEmail?: (email: string) => Promise<AdapterUser | null>;
     updateUser?: (userId: string, data: Partial<AdapterUser>) => Promise<AdapterUser>;
