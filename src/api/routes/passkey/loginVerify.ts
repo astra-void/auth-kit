@@ -73,7 +73,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
 
         const { verified, authenticationInfo } = verification;
         if (verified) {
-            await adapter.updatePasskey?.(email, { counter: authenticationInfo.newCounter });
+            await adapter.updatePasskey?.(dbPasskey.id, { counter: authenticationInfo.newCounter });
 
             const token = await signJWT({
                 payload: {
