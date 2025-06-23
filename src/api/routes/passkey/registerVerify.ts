@@ -81,7 +81,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
 
         await config.adapter.createPasskey?.(
             user.id,
-            webAuthnID,
+            Buffer.from(webAuthnID),
             publicKey,
             transports
         );

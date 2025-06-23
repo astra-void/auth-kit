@@ -20,10 +20,7 @@ export async function registerPasskey() {
             return;
         }
 
-        const userId = Buffer.from(options.user.id, "base64").toString();
-
         const verifyResponse = await axios.post('/api/auth/register/passkey/verify', {
-            userId,
             credential: attResp,
         });
 
