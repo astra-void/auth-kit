@@ -1,9 +1,12 @@
 # @astra-void/auth-kit
 
 > Lightweight authentication kit for Next.js
-> **Alpha version – subject to change**
+> **Still developing – subject to change**
 
 ---
+
+## Security Note
+⚠️ This library handles sensitive authentication logic. Please review and test carefully before using in production.
 
 ## 🚀 Getting Started
 
@@ -23,7 +26,7 @@ pnpm add @astra-void/auth-kit
 
 Set up your project like this:
 
-```md
+```txt
 📂 your-nextjs-app
 │ app/
 │  └─ api/
@@ -60,7 +63,7 @@ export interface Adapter {
 }
 ```
 
-### The User interface should be like
+### The User interface
 ```ts
 export interface User {
     id: string;
@@ -71,24 +74,27 @@ export interface User {
 }
 ```
 
-#### Adapter Example (e.g. Prisma)
-
+### Use default Prisma Adapter
 ```ts
-const PrismaAdapter: Adapter = {
-  getUserByEmail: async (email) => {
-    const user = await prisma.user.findUnique({ where: { email } });
-    return user || null;
-  },
-  createUser: async (email, hashedPassword) => {
-    const user = await prisma.user.create({
-      data: { email, hashedPassword },
-    });
-    return user;
-  }
-};
+import { PrismaAdapter } from "@astra-void/auth-kit/adapter";
+
+const handler = AuthKit({
+    adapter: PrismaAdapter(prisma),
+});
 ```
 
+### Use passkey for login
+```ts
+const handler = AuthKit({
+    adapter: YourAdapter,
+    passkey: {
+        rpId: "localhost", // for example
+        rpName: "Passkey", // for example
+        store: "memory" // for development, more store will be supported
+    }
+});
 
+```
 
 ---
 
@@ -103,7 +109,8 @@ const middleware = AuthKitMiddleware({
   loginPath: '/login', // default: '/login'
   logoutPath: '/logout', // default: '/logout'
   registerPath: '/register', // default: '/register'
-  protectedRoutes: ['dashboard'], // protect routes
+  protectedRoutes: ['dashboard'], // protected routes
+  alwaysSetToken: false, // default: false
 });
 
 export { middleware };
@@ -137,6 +144,20 @@ import { register } from '@astra-void/auth-kit/react';
 await register({ email: 'test@example.com', password: '12345678' });
 ```
 
+### Login with Passkey
+```ts
+import { loginPasskey } from "@astra-void/auth-kit/react/passkey";
+
+await loginPasskey({ email: 'test@example.com' });
+```
+
+### Register new Passkey (should login)
+```ts
+import { registerPasskey } from "@astra-void/auth-kit/react/passkey";
+
+await registerPasskey();
+```
+
 ### Session Hook
 
 ```ts
@@ -145,23 +166,38 @@ import { useSession } from '@astra-void/auth-kit/react/hooks';
 const { user, status } = useSession();
 ```
 
+### Import Map
+```ts
+// Setup
+import { AuthKit } from "@astra-void/auth-kit";
+
+// Middleware
+import { AuthKitMiddleware } from "@astra-void/auth-kit/middleware";
+
+// Client API
+import { login, logout } from "@astra-void/auth-kit/react";
+
+// Passkey client API
+import { loginPasskey } from "@astra-void/auth-kit/react/passkey";
+```
+
 ---
 
 ## 🧰 Features
 
-* ✅ Email/Password Authentication
+* ✅ Email/Password/Passkey Authentication
 * 🔒 Automatic CSRF Protection
 * 🍪 JWT-based Sessions
 * 🔀 Middleware Route Protection
 * ⚙️ Provider support (coming soon)
+* 🔌 Adapter support: Prisma (only)
 
 ---
 
 ## 📌 Roadmap
 
 * [ ] Social login (Google, GitHub, etc.)
-* [ ] Adapter support: Prisma, Drizzle, etc.
-* [ ] Magic Link / Passkey support
+* [ ] More adapter support: Drizzle, etc.
 
 ---
 
