@@ -65,7 +65,7 @@ export function PrismaAdapter(prisma: any): Adapter {
 
     getPasskey: async (userId) => {
       const passkeys = await prisma.passkey.findMany({
-        where: { userID: userId },
+        where: { userId: userId },
       });
       return passkeys.map((p: Passkey) => ({
         id: p.id,
@@ -99,30 +99,30 @@ export function PrismaAdapter(prisma: any): Adapter {
       }));
     },
 
-    createPasskey: async (userId, webAuthnID, publicKey, transports) => {
-      const newKey = await prisma.passkey.create({
+    createPasskey: async (userId, webAuthnId, publicKey, transports) => {
+      const passkey = await prisma.passkey.create({
         data: {
           userID: userId,
-          webAuthnID,
+          webAuthnId,
           publicKey,
           transports,
         },
       });
       return {
-        id: newKey.id,
-        publicKey: newKey.publicKey,
-        userId: newKey.userID,
-        webAuthnId: newKey.webAuthnID,
-        counter: newKey.counter,
-        transports: newKey.transports,
-        createdAt: newKey.createdAt,
-        updatedAt: newKey.updatedAt,
+        id: passkey.id,
+        publicKey: passkey.publicKey,
+        userId: passkey.userId,
+        webAuthnId: passkey.webAuthnId,
+        counter: passkey.counter,
+        transports: passkey.transports,
+        createdAt: passkey.createdAt,
+        updatedAt: passkey.updatedAt,
       };
     },
 
     deletePasskey: async (userId) => {
       await prisma.passkey.deleteMany({
-        where: { userID: userId },
+        where: { userId: userId },
       });
       return null;
     },
