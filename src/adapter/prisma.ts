@@ -123,6 +123,21 @@ export function PrismaAdapter(prisma: any): Adapter {
       }));
     },
 
+    getPasskeys: async () => {
+      const passkeys = await prisma.passkey.findMany();
+      
+      return passkeys?.map((p: Passkey) => ({
+        id: p.id,
+        publicKey: p.publicKey,
+        userId: p.userId,
+        webAuthnId: p.webAuthnId,
+        counter: p.counter,
+        transports: p.transports,
+        createdAt: p.createdAt,
+        updatedAt: p.updatedAt,
+      }))
+    },
+
     updatePasskey: async (passkeyId, data) => {
       const passkey = await prisma.passkey.update({
         where: { id: passkeyId },

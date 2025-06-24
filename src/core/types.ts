@@ -7,6 +7,7 @@ export interface AuthKitParams {
     passkey?: {
         rpId: string;
         rpName: string;
-        store: 'memory' | 'redis'; 
+        store: 'memory' | 'redis';
+        mode?: 'email' | 'credential'
     };
 }
