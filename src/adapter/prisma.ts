@@ -37,8 +37,7 @@ function mapPasskey(passkey: Passkey) {
 }
 
 function mapPasskeys(passkeys: Passkey[]): Passkey[] {
-  return {
-    ...passkeys.map((p: Passkey) => ({
+  return passkeys.map((p: Passkey) => ({
       id: p.id,
       publicKey: p.publicKey,
       userId: p.userId,
@@ -47,8 +46,7 @@ function mapPasskeys(passkeys: Passkey[]): Passkey[] {
       transports: p.transports,
       createdAt: p.createdAt,
       updatedAt: p.updatedAt,
-    }))
-  };
+    }));
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
