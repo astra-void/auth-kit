@@ -27,7 +27,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
                 return NextResponse.json({ error: "User not found or no passkeys registered" }, { status: 404 });
             }
 
-            const expectedChallenge = await getChallenge(config, user.id)
+            const expectedChallenge = await getChallenge(config, credential.id)
 
             if (!expectedChallenge) {
                 return NextResponse.json({ error: "Challenge not found" }, { status: 400 });
@@ -118,12 +118,12 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
             }
 
             if (!user || user.passkeys.length === 0) {
-            return NextResponse.json({ error: "User not found or no passkeys" }, { status: 404 });
+               return NextResponse.json({ error: "User not found or no passkeys" }, { status: 404 });
             }
 
-            const expectedChallenge = await getChallenge(config, user.id);
+            const expectedChallenge = await getChallenge(config, credential.id);
             if (!expectedChallenge) {
-            return NextResponse.json({ error: "Challenge not found" }, { status: 400 });
+                return NextResponse.json({ error: "Challenge not found" }, { status: 400 });
             }
 
             const incomingID = Buffer.from(credential.id, "base64url");
@@ -183,7 +183,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
                     maxAge: 60 * 60,
                 });
 
-                await deleteChallenge(config, user.id);
+                await deleteChallenge(config, credential.id);
                 
                 return res;
             }
