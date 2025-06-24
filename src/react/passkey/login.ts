@@ -11,8 +11,12 @@ export async function loginPasskey(params?: LoginPasskeyParams) {
             throw Error("Already logged in")
         }
 
-        if (params && params.email) {
-            const { email, redirect = true, redirectUrl = '/' } = params;
+        const redirect = params?.redirect ?? true;
+        const redirectUrl = params?.redirectUrl ?? '/';
+
+        if (params?.email) {
+            const { email } = params;
+
             const options = (await axios.post('/api/auth/login/passkey/options', { email })).data.options;
             const credential = await startAuthentication({ optionsJSON: options });
             const verification = (await axios.post("/api/auth/login/passkey/verify", { email, credential })).data.success;
@@ -28,10 +32,7 @@ export async function loginPasskey(params?: LoginPasskeyParams) {
             }
         }
 
-        const redirect = params?.redirect ?? true;
-        const redirectUrl = params?.redirectUrl ?? '/';
-        
-        const options = (await axios.post('/api/auth/login/passkey/options')).data.options;
+        const options = (await axios.post('/api/auth/login/passkey/options')).data;
         const credential = await startAuthentication({ optionsJSON: options });
         const verification = (await axios.post('/api/auth/login/passkey/verify', { credential })).data.success;
 

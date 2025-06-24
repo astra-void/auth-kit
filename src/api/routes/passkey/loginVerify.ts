@@ -173,7 +173,6 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
                 return NextResponse.json({ error: (error as Error).message }, { status: 400 });
             }
 
-            // TODO: write from here;;;
             const { verified, authenticationInfo } = verification;
             if (verified) {
                 await config.adapter.updatePasskey?.(dbPasskey.id, { counter: authenticationInfo.newCounter });
@@ -185,7 +184,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
                     },
                     secret: process.env.AUTHKIT_SECRET!,
                 });
-                const res = NextResponse.json({ ok: true });
+                const res = NextResponse.json({ success: true });
                 res.cookies.set(getCookieName('auth-kit.session-token'), token!, {
                     httpOnly: true,
                     secure: true,

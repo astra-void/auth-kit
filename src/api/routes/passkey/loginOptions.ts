@@ -12,12 +12,11 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
             return NextResponse.json({ error: "rpId and rpName is required" }, { status: 400 });
         }
 
-        const { mode = 'email' } = config.passkey;
-        const { store } = config.passkey;
+        const { mode = 'email', store } = config.passkey;
+        const { adapter } = config;
         
         if (mode === 'email') {
             const { email } = await req.json();
-            const { adapter } = config;
 
             const user = await adapter.getUserByEmail?.(email);
             const passkey = await adapter.getPasskeyByEmail?.(email);
@@ -46,7 +45,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
         }
 
         if (mode === 'credential') {
-            const passkeys = await config.adapter.getPasskeys?.();
+            const passkeys = await adapter.getPasskeys?.();
 
             if (!passkeys) {
                 return NextResponse.json({ error: "No passkeys found" }, { status: 404 } );

@@ -36,6 +36,7 @@ export function PrismaAdapter(prisma: any): Adapter {
     getUser: async (id) => {
       const user = await prisma.user.findUnique({
         where: { id },
+        include: { passkeys: true },
       });
       return user ? mapUser(user) : null;
     },
@@ -43,6 +44,7 @@ export function PrismaAdapter(prisma: any): Adapter {
     getUserByEmail: async (email) => {
       const user = await prisma.user.findUnique({
         where: { email },
+        include: { passkeys: true },
       });
       return user ? mapUser(user) : null;
     },
@@ -121,6 +123,14 @@ export function PrismaAdapter(prisma: any): Adapter {
         createdAt: p.createdAt,
         updatedAt: p.updatedAt,
       }));
+    },
+
+    getPasskeyByRaw: async (webAuthnId) => {
+        const passkey: Passkey = await prisma.passkey.findUnique({
+          where: { webAuthnId }
+        });
+        
+        return passkey;
     },
 
     getPasskeys: async () => {
