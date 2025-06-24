@@ -12,14 +12,28 @@ export async function loginPasskey(params: LoginPasskeyParams) {
             throw Error("Already logged in")
         }
 
-        const options = (await axios.post('/api/auth/login/passkey/options', { email })).data.options;
+        if (email) {
+            const options = (await axios.post('/api/auth/login/passkey/options', { email })).data.options;
+            const credential = await startAuthentication({ optionsJSON: options });
+            const verification = (await axios.post("/api/auth/login/passkey/verify", { email, credential })).data.success;
 
+            if (verification === true) {
+                if (redirect) {
+                    window.location.href = redirectUrl
+                    return true;
+                }
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        const options = (await axios.post('/api/auth/login/passkey/options')).data.options;
         const credential = await startAuthentication({ optionsJSON: options });
-
-        const verification = (await axios.post("/api/auth/login/passkey/verify", { email, credential })).data.success;
+        const verification = (await axios.post('/api/auth/login/passkey/verify', { credential })).data.success;
 
         if (verification === true) {
-             if (redirect) {
+            if (redirect) {
                 window.location.href = redirectUrl
                 return true;
             }
@@ -27,7 +41,6 @@ export async function loginPasskey(params: LoginPasskeyParams) {
         } else {
             return false;
         }
-
     } catch {
         return false;
     }

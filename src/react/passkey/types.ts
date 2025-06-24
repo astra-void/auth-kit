@@ -1,5 +1,5 @@
 export interface LoginPasskeyParams {
-    email: string;
+    email?: string;
     redirect?: boolean;
     redirectUrl?: string;
 }
