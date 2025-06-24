@@ -1,30 +1,32 @@
 import { useEffect, useState } from "react";
 import { AdapterUser } from "../../adapter";
-import { User } from "./types";
+import { SessionStatus, User, UseSessionResult } from "./types";
 import axios from "axios";
 
-export function useSession(): { user: User | AdapterUser | null; loading: boolean } {
+export function useSession(): UseSessionResult {
     const [user, setUser] = useState<User | AdapterUser | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [status, setStatus] = useState<SessionStatus>("loading");
 
     useEffect(() => {
         let isMounted = true;
 
         const getSession = async () => {
             try {
-                await axios.get('/api/auth/session').then((res) => {
-                    const data = res.data;
-                    if (isMounted) {
-                        setUser(data.user ?? null);
+                const data = (await axios.get('/api/auth/session')).data
+
+                if (isMounted) {
+                    if (data.user) {
+                        setUser(data.user);
+                        setStatus("authenticated");
+                    } else {
+                        setUser(null);
+                        setStatus("unauthenticated");
                     }
-                });
+                }
             } catch {
                 if (isMounted) {
                     setUser(null);
-                }
-            } finally {
-                if (isMounted) {
-                    setLoading(false);
+                    setStatus("unauthenticated")
                 }
             }
         };
@@ -36,5 +38,5 @@ export function useSession(): { user: User | AdapterUser | null; loading: boolea
         }
     }, []);
 
-    return { user, loading };
+    return { data: user, status };
 }
