@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 > Next.js authentication with passkey support
-> **Still developing – subject to change**
+> While core features are stable, APIs may change before v1.0.0.
 
 ---
 
@@ -55,6 +55,55 @@ const handler = AuthKit({
 });
 
 export { handler as GET, handler as POST };
+```
+
+## If you want to use passkey
+```ts
+const handler = AuthKit({
+    adapter: PrismaAdapter(prisma),
+    passkey: {
+        rpId: "localhost",
+        rpName: "Passkey",
+        mode: "credential",
+        challengeStore: YourChallengeStore
+    }
+});
+
+export { handler as GET, handler as POST };
+```
+
+## Challenge Store interface
+```ts
+export interface ChallengeStore {
+    get: (userId: string) => Promise<string | null>;
+    set: (userId: string, challenge: string) => Promise<void>;
+    delete: (userId: string) => Promise<void>;
+}
+```
+
+## Example for Redis
+```ts
+import { ChallengeStore } from "@astra-void/auth-kit";
+
+const PREFIX = "passkey:challenge";
+
+const RedisChallengeStore: ChallengeStore = {
+    get: async (userId) => {
+        const key = `${PREFIX}:${userId}`;
+        return await redis.get(key);
+    },
+
+    set: async (userId, challenge) => {  
+        const key = `${PREFIX}:${userId}`;
+        await redis.set(key, challenge, "EX", 300);
+        return;
+    },
+
+    delete: async (userId) => {
+        const key = `${PREFIX}:${userId}`;
+        await redis.del(key);
+    }
+};
 ```
 
 ### Adapter Types
@@ -141,19 +190,6 @@ model Passkey {
 ```
 + This Prisma schema is written for SQL-based databases (e.g. PostgreSQL, MySQL).
 
-### Use passkey for login
-```ts
-const handler = AuthKit({
-    adapter: YourAdapter,
-    passkey: {
-        rpId: "localhost", // for example
-        rpName: "Passkey", // for example
-        store: "memory" // for development, more store will be supported
-    }
-});
-
-```
-
 ---
 
 ### `middleware.ts`
@@ -208,8 +244,14 @@ import { loginPasskey } from "@astra-void/auth-kit/react/passkey";
 
 await loginPasskey({ email: 'test@example.com' });
 ```
+## If you are using credential
+```ts
+import { loginPasskey } from "@astra-void/auth-kit/react/passkey";
 
-### Register new Passkey (should login)
+await loginPasskey();
+```
+
+### Register new Passkey (should logged in)
 ```ts
 import { registerPasskey } from "@astra-void/auth-kit/react/passkey";
 
@@ -219,10 +261,14 @@ await registerPasskey();
 ### Session Hook
 
 ```ts
-import { useSession } from '@astra-void/auth-kit/react/hooks';
+const { data: user, status } = useSession();
 
-const { user, status } = useSession();
+if (status === "loading") return <Spinner />;
+if (status === "unauthenticated") router.push("/login");
+
+return <p>Welcome {user?.email}!</p>;
 ```
++ The status is 'authenticated' | 'unauthenticated' | 'loading';
 
 ### Import Map
 ```ts
