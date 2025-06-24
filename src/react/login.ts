@@ -1,30 +1,23 @@
-import axios from "axios";
 import { LoginParams } from "./types";
 import { User } from "./hooks";
 import { AdapterUser } from "../adapter";
-import { getCsrfTokenFromCookie } from "./utils";
+import { authRequest } from "./utils";
 
 export async function login(params: LoginParams): Promise<User | AdapterUser | null> {
     try {
         const { email, password, redirect = true, redirectUrl = '/' } = params;
-
-        const csrfToken = getCsrfTokenFromCookie();
-        if (!csrfToken) {
-            throw new Error("CSRF token not found.");
-        }
-
-        const req = await axios.post('/api/auth/login', 
-            { email, password },
-            { headers: {
-                'X-CSRF-Token' : csrfToken
-            } });
+        const req = await authRequest<User | AdapterUser | null>(
+            "POST", 
+            "/api/auth/login", 
+            { email, password }
+        );
 
         if (redirect) {
             window.location.href = redirectUrl
             return null;
         }
 
-        return req.data;
+        return req;
     } catch {
         return null;
     }

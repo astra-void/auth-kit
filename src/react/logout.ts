@@ -1,27 +1,21 @@
-import axios from "axios";
-import { getCsrfTokenFromCookie } from "./utils";
 import { LogoutParams } from "./types";
+import { authRequest } from "./utils";
 
 export async function logout(params: LogoutParams = {}) {
     try {
         const { redirect = true, redirectUrl = '/' } = params;
-        const csrfToken = getCsrfTokenFromCookie();
-        if (!csrfToken) {
-            throw new Error("CSRF token not found.");
-        }
 
-        const req = await axios.post('/api/auth/logout', {}, {
-            headers: {
-                'X-CSRF-Token' : csrfToken,
-            }
-        });
+        const req = await authRequest(
+            "POST",
+            "/api/auth/logout",
+        );
 
         if (redirect) {
             window.location.href = redirectUrl;
             return null;
         }
 
-        return req.data;
+        return req;
     } catch {
         return false;
     }
