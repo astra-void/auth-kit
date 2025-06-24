@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AuthKitParams } from "../../../core/types";
 import { generateAuthenticationOptions } from "@simplewebauthn/server";
-import { storeChallenge } from "../../../core/lib/challenge";
+import { storeChallenge } from "../../lib";
 
 export async function POST(req: NextRequest, config: AuthKitParams) {
     try {
@@ -12,7 +12,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
             return NextResponse.json({ error: "rpId and rpName is required" }, { status: 400 });
         }
 
-        const { mode = 'email', store } = config.passkey;
+        const { mode = 'email' } = config.passkey;
         const { adapter } = config;
         
         if (mode === 'email') {
@@ -37,9 +37,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
                 userVerification: "preferred",
             });
 
-            if (store === 'memory') {
-                await storeChallenge(email, options.challenge);
-            }
+            await storeChallenge(config, user.id, options.challenge);
 
             return NextResponse.json({ options }, { status: 200 });
         }
@@ -64,11 +62,11 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
                 userVerification: "preferred",
             });
 
-            for (const cred of allowCredentials) {
-                if (store === 'memory') {
-                    await storeChallenge(cred.id, options.challenge);
-                }
-            }
+            await Promise.all(
+                allowCredentials.map((cred) => 
+                    storeChallenge(config, cred.id, options.challenge)
+                )
+            );
 
             return NextResponse.json(options, { status: 200 });
         }

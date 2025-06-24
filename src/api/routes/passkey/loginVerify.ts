@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AuthKitParams } from "../../../core/types";
-import { deleteChallenge, getChallenge } from "../../../core/lib/challenge";
 import { VerifiedAuthenticationResponse, verifyAuthenticationResponse, VerifyAuthenticationResponseOpts } from "@simplewebauthn/server";
 import { signJWT } from "../../../jwt";
 import { getCookieName } from "../../../core/lib/cookie";
+import { deleteChallenge, getChallenge } from "../../lib";
 
 export async function POST(req: NextRequest, config: AuthKitParams) {
     try {
@@ -15,7 +15,6 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
         }
 
         const { mode = 'email' } = config.passkey;
-        const { store } = config.passkey;
         
         if (mode === 'email') {
             const { email, credential } = await req.json();
@@ -24,14 +23,11 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
             const user = await adapter.getUserByEmail?.(email);
             const passkey = await adapter.getPasskeyByEmail?.(email);
 
-            let expectedChallenge;
-            if (store === 'memory') {
-                expectedChallenge = await getChallenge(email)
-            }
-
             if (!user || !passkey || passkey.length === 0) {
                 return NextResponse.json({ error: "User not found or no passkeys registered" }, { status: 404 });
             }
+
+            const expectedChallenge = await getChallenge(config, user.id)
 
             if (!expectedChallenge) {
                 return NextResponse.json({ error: "Challenge not found" }, { status: 400 });
@@ -78,9 +74,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
                 console.error("[VERIFY AUTHENTICATION ERROR]", error);
                 return NextResponse.json({ error: (error as Error).message }, { status: 400 });
             } finally {
-                if (store === 'memory') {
-                    await deleteChallenge(email);
-                }
+                await deleteChallenge(config, user.id);
             }
 
             const { verified, authenticationInfo } = verification;
@@ -127,11 +121,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
             return NextResponse.json({ error: "User not found or no passkeys" }, { status: 404 });
             }
 
-            let expectedChallenge;
-            if (store === 'memory') {
-                expectedChallenge = await getChallenge(credential.id);
-            }
-
+            const expectedChallenge = await getChallenge(config, user.id);
             if (!expectedChallenge) {
             return NextResponse.json({ error: "Challenge not found" }, { status: 400 });
             }
@@ -193,9 +183,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
                     maxAge: 60 * 60,
                 });
 
-                if (store === 'memory') {
-                    await deleteChallenge(credential.id);
-                }
+                await deleteChallenge(config, user.id);
                 
                 return res;
             }

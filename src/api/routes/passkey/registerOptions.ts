@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AuthKitParams } from "../../../core/types";
 import { generateRegistrationOptions } from "@simplewebauthn/server";
-import { storeRegistrationChallenge } from "../../../core/lib/challenge";
 import { getSession } from "../../../auth/lib/session";
+import { storeChallenge } from "../../lib";
 
 export async function POST(req: NextRequest, config: AuthKitParams) {
     try {
@@ -31,9 +31,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
             supportedAlgorithmIDs: [-7, -257],
         });
 
-        if (config.passkey.store === 'memory') {
-            storeRegistrationChallenge(user.id, options.challenge);
-        }
+        await storeChallenge(config, user.id, options.challenge);
 
         return NextResponse.json({ options }, { status: 200 });
     } catch (error) {

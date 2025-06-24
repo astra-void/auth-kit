@@ -23,6 +23,34 @@ function mapUser(user: AdapterUser): AdapterUser {
   };
 }
 
+function mapPasskey(passkey: Passkey) {
+  return {
+    id: passkey.id,
+    publicKey: passkey.publicKey,
+    userId: passkey.userId,
+    webAuthnId: passkey.webAuthnId,
+    counter: passkey.counter,
+    transports: passkey.transports,
+    createdAt: passkey.createdAt,
+    updatedAt: passkey.updatedAt,
+  }
+}
+
+function mapPasskeys(passkeys: Passkey[]): Passkey[] {
+  return {
+    ...passkeys.map((p: Passkey) => ({
+      id: p.id,
+      publicKey: p.publicKey,
+      userId: p.userId,
+      webAuthnId: p.webAuthnId,
+      counter: p.counter,
+      transports: p.transports,
+      createdAt: p.createdAt,
+      updatedAt: p.updatedAt,
+    }))
+  };
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function PrismaAdapter(prisma: any): Adapter {
   return {
@@ -74,32 +102,14 @@ export function PrismaAdapter(prisma: any): Adapter {
           transports,
         },
       });
-      return {
-        id: passkey.id,
-        publicKey: passkey.publicKey,
-        userId: passkey.userId,
-        webAuthnId: passkey.webAuthnId,
-        counter: passkey.counter,
-        transports: passkey.transports,
-        createdAt: passkey.createdAt,
-        updatedAt: passkey.updatedAt,
-      };
+      return mapPasskey(passkey);
     },
 
     getPasskey: async (userId) => {
       const passkeys = await prisma.passkey.findMany({
         where: { userId: userId },
       });
-      return passkeys.map((p: Passkey) => ({
-        id: p.id,
-        publicKey: p.publicKey,
-        userId: p.userId,
-        webAuthnId: p.webAuthnId,
-        counter: p.counter,
-        transports: p.transports,
-        createdAt: p.createdAt,
-        updatedAt: p.updatedAt,
-      }));
+      return passkeys ? mapPasskeys(passkeys) : null;
     },
 
     getPasskeyByEmail: async (email) => {
@@ -113,39 +123,21 @@ export function PrismaAdapter(prisma: any): Adapter {
       });
       if (passkeys.length === 0) return null;
 
-      return passkeys?.map((p: Passkey) => ({
-        id: p.id,
-        publicKey: p.publicKey,
-        userId: p.userId,
-        webAuthnId: p.webAuthnId,
-        counter: p.counter,
-        transports: p.transports,
-        createdAt: p.createdAt,
-        updatedAt: p.updatedAt,
-      }));
+      return passkeys ? mapPasskeys(passkeys) : null;
     },
 
     getPasskeyByRaw: async (webAuthnId) => {
-        const passkey: Passkey = await prisma.passkey.findUnique({
+        const passkey = await prisma.passkey.findUnique({
           where: { webAuthnId }
         });
         
-        return passkey;
+        return passkey ? mapPasskey(passkey) : null;
     },
 
     getPasskeys: async () => {
       const passkeys = await prisma.passkey.findMany();
       
-      return passkeys?.map((p: Passkey) => ({
-        id: p.id,
-        publicKey: p.publicKey,
-        userId: p.userId,
-        webAuthnId: p.webAuthnId,
-        counter: p.counter,
-        transports: p.transports,
-        createdAt: p.createdAt,
-        updatedAt: p.updatedAt,
-      }))
+      return passkeys ? mapPasskeys(passkeys) : null;
     },
 
     updatePasskey: async (passkeyId, data) => {
@@ -157,16 +149,7 @@ export function PrismaAdapter(prisma: any): Adapter {
         },
       });
 
-      return {
-        id: passkey.id,
-        publicKey: passkey.publicKey,
-        userId: passkey.userId,
-        webAuthnId: passkey.webAuthnId,
-        counter: passkey.counter,
-        transports: passkey.transports,
-        createdAt: passkey.createdAt,
-        updatedAt: passkey.updatedAt,
-      };
+      return mapPasskey(passkey);
     },
 
     deletePasskey: async (userId) => {

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AuthKitParams } from "../../../core/types";
-import { deleteRegistrationChallenge, getRegistrationChallenge } from "../../../core/lib/challenge";
 import { VerifiedRegistrationResponse, verifyRegistrationResponse, VerifyRegistrationResponseOpts } from "@simplewebauthn/server";
 import { getSession } from "../../../auth/lib/session";
+import { deleteChallenge, getChallenge } from "../../lib";
 
 function decodeBase64Url(input: string): Uint8Array {
     const base64 = input.replace(/-/g, "+").replace(/_/g, "/");
@@ -24,17 +24,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
             return NextResponse.json({ error: "Not logged in" }, { status: 401 });
         }
 
-        let expectedChallenge: string | undefined = undefined;
-        if (config.passkey?.store === 'memory') {
-            expectedChallenge = getRegistrationChallenge(user.id) ?? undefined;
-        } else if (config.passkey?.store === 'redis') {
-            // TODO: Implement Redis challenge store
-            return NextResponse.json(
-                { error: "Redis store not implemented yet" },
-                { status: 501 }
-            );
-        }
-
+        const expectedChallenge = await getChallenge(config, user.id);
         if (!expectedChallenge) {
             return NextResponse.json({ error: "Challenge not found" }, { status: 400 });
         }
@@ -57,7 +47,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
             console.error("[VERIFY REGISTRATION ERROR]", error);
             return NextResponse.json({ error: (error as Error).message }, { status: 400 });
         } finally {
-            deleteRegistrationChallenge(user.id);
+            await deleteChallenge(config, user.id);
         }
 
         if (!verified || !registrationInfo) {
