@@ -3,16 +3,16 @@ import { getSession } from "./getSession";
 import { startAuthentication } from "@simplewebauthn/browser";
 import { LoginPasskeyParams } from "./types";
 
-export async function loginPasskey(params: LoginPasskeyParams) {
+export async function loginPasskey(params?: LoginPasskeyParams) {
     try {
         const session = await getSession();
-        const { email, redirect = true, redirectUrl = '/' } = params;
 
         if (session) {
             throw Error("Already logged in")
         }
 
-        if (email) {
+        if (params && params.email) {
+            const { email, redirect = true, redirectUrl = '/' } = params;
             const options = (await axios.post('/api/auth/login/passkey/options', { email })).data.options;
             const credential = await startAuthentication({ optionsJSON: options });
             const verification = (await axios.post("/api/auth/login/passkey/verify", { email, credential })).data.success;
@@ -28,6 +28,9 @@ export async function loginPasskey(params: LoginPasskeyParams) {
             }
         }
 
+        const redirect = params?.redirect ?? true;
+        const redirectUrl = params?.redirectUrl ?? '/';
+        
         const options = (await axios.post('/api/auth/login/passkey/options')).data.options;
         const credential = await startAuthentication({ optionsJSON: options });
         const verification = (await axios.post('/api/auth/login/passkey/verify', { credential })).data.success;
