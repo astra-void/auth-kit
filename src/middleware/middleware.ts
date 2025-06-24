@@ -26,13 +26,13 @@ export function AuthKitMiddleware(config: MiddlewareParams) {
         if (!needCsrfToken) return NextResponse.next();
 
         const cookieName = getCookieName(CSRF_COOKIE_NAME);
-        const existingToken = req.cookies.get(cookieName);
-        if (existingToken) {
-            return NextResponse.next();
-        }
 
         const token = generateCsrfToken();
+
         const res = NextResponse.next();
+        
+        res.cookies.delete(cookieName);
+
         res.cookies.set(cookieName, token, {
             httpOnly: false,
             sameSite: 'strict',
