@@ -1,7 +1,15 @@
 # @astra-void/auth-kit
 
-> Lightweight authentication kit for Next.js
-> **Alpha version – subject to change**
+[![npm](https://img.shields.io/npm/v/@astra-void/auth-kit)](https://www.npmjs.com/package/@astra-void/auth-kit)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+> Next.js authentication with passkey support
+> **Still developing – subject to change**
+
+---
+
+## Security Note
+⚠️ This library handles sensitive authentication logic. Please review and test carefully before using in production.
 
 ---
 
