@@ -13,7 +13,7 @@ export interface AuthKitParams {
     passkey?: {
         rpId: string;
         rpName: string;
-        store?: 'memory' | 'custom';
+        store?: 'memory' | 'redis' | 'custom';
         mode?: 'email' | 'credential'
         challengeStore?: ChallengeStore;
     };

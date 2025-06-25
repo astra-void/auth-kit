@@ -9,6 +9,8 @@ export async function storeChallenge(config: AuthKitParams, userId: string, chal
     switch (store) {
         case 'memory':
             return await storeChallengeMap(userId, challenge);
+        case 'redis':
+            return await config.passkey.challengeStore?.set(userId, challenge);
         case 'custom':
             return await challengeStore?.set(userId, challenge);
         default:
@@ -24,6 +26,8 @@ export async function getChallenge(config: AuthKitParams, userId: string): Promi
     switch (store) {
         case 'memory':
             return await getChallengeMap(userId) ?? null;
+        case 'redis':
+            return await config.passkey.challengeStore?.get(userId) ?? null;
         case 'custom':
             return await challengeStore?.get(userId) ?? null;;
         default:

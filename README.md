@@ -6,7 +6,7 @@
 > 🔐 Next.js authentication with passkey support.
 > While core features are stable, APIs may change before v1.0.0.
 
-**@astra-void/auth-kit** is an authentication kit for Next.js, supporting both traditional email/password and modern passkey (WebAuthn) login flows. Designed for flexibility, it works with any database via adapter-based architecture.   
+**@astra-void/auth-kit** is a simple authentication kit for Next.js, supporting both traditional email/password and modern passkey (WebAuthn) login flows. Designed for flexibility, it works with any database via adapter-based architecture.
 
 ---
 
@@ -86,7 +86,7 @@ return <p>Welcome {user?.email}!</p>;
 
 ---
 
-## 🧪 Example Schema
+## Example Schema
 
 ```prisma
 model User {
@@ -111,14 +111,14 @@ model Passkey {
 
 ## Documentation
 
-Full docs & API reference →
+Full docs →
 👉 [https://auth-kit-documentation.vercel.app](https://auth-kit-documentation.vercel.app)
 
 ---
 
 ## Customization
 
-Want to use your own DB? Check out the [Adapters Guide](https://auth-kit-documentation.vercel.app/adapters/overview) to build a custom adapter.
+Want to use your own DB? Check out the [Adapters Guide](https://auth-kit-documentation.vercel.app/documentation/adapters/overview) to build a custom adapter.
 
 ---
 
