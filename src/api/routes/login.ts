@@ -3,31 +3,29 @@ import { AuthKitParams } from "../../core/types";
 import { verifyPassword } from "../../auth";
 import { signJWT } from "../../jwt";
 import { getCookieName } from "../../core/lib/cookie";
-import { CSRF_COOKIE_NAME, verifyCsrf } from "../../middleware/lib";
+import { verifyCsrf } from "../../middleware/lib";
+import { errorResponse } from "../lib";
 
 export async function POST(req: NextRequest, config: AuthKitParams) {  
     try {
         const { email, password } = await req.json();
 
-        const headerToken = req.headers.get('X-CSRF-Token');
-        const cookieToken = req.cookies.get(CSRF_COOKIE_NAME)?.value;
-
-        if (!headerToken || !cookieToken || !verifyCsrf(req)) {
-            return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 })
+        if (!verifyCsrf(req)) {
+            return errorResponse("Invalid CSRF token", 403);
         };
 
         if (!email || !password) {
-            return NextResponse.json({ error: 'Email and password are required.' }, { status: 400 });
+            return errorResponse("Invalid request", 400)
         }
 
         const user = await config.adapter.getUserByEmail?.(email);
         if (!user) {
-            return NextResponse.json({ error: "User not found" }, { status: 404 });
+            return errorResponse("Invalid credentials", 401);
         }
 
         const compare = await verifyPassword(password, user.hashedPassword!);
         if (!compare) {
-            return NextResponse.json({ error: "Invalid credentials" }, { status: 401 } );
+            return errorResponse("Invalid credentials", 401);
         }
 
         const token = await signJWT({
@@ -47,7 +45,8 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
         });
 
         return res;
-    } catch {
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    } catch (error) {
+        console.error("[AUTH-KIT-ERROR]", error);
+        return errorResponse();
     }
 }

@@ -2,18 +2,25 @@ import { NextRequest, NextResponse } from "next/server";
 import { AuthKitParams } from "../../../core/types";
 import { generateRegistrationOptions } from "@simplewebauthn/server";
 import { getSession } from "../../../auth/lib/session";
-import { storeChallenge } from "../../lib";
+import { errorResponse, storeChallenge } from "../../lib";
+import { verifyCsrf } from "../../../middleware/lib";
 
 export async function POST(req: NextRequest, config: AuthKitParams) {
     try {
-        if (!config.passkey?.rpId || !config.passkey.rpName) {
-            return NextResponse.json({ error: "rpId and rpName is required" });
+        if (!config.passkey) {
+            return errorResponse("Passkey config is required", 400);
         }
+        if (!config.passkey?.rpId || !config.passkey.rpName) {
+            return errorResponse("rpId and rpName is required", 400);
+        }
+        if (!verifyCsrf(req)) {
+            return errorResponse("Invalid CSRF token", 403);
+        };
 
         const user = await getSession(config)
 
         if (!user) {
-            return NextResponse.json({ success: false, message: "Not logged in" }, { status: 401 });
+            return errorResponse("Authentication required", 401);
         }
 
         const options = await generateRegistrationOptions({
@@ -35,7 +42,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
 
         return NextResponse.json({ options }, { status: 200 });
     } catch (error) {
-        console.error("[INTERNAL ERROR]", error);
-        return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+        console.error("[AUTH-KIT-ERROR]", error);
+        return errorResponse();
     }
 }

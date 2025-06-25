@@ -1,16 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AuthKitParams } from "../../../core/types";
 import { generateAuthenticationOptions } from "@simplewebauthn/server";
-import { storeChallenge } from "../../lib";
+import { errorResponse, storeChallenge } from "../../lib";
+import { verifyCsrf } from "../../../middleware/lib";
 
 export async function POST(req: NextRequest, config: AuthKitParams) {
     try {
         if (!config.passkey) {
-            return NextResponse.json({ error: "Passkey config is required" }, { status: 400 });
+            return errorResponse("Passkey config is required", 400);
         }
         if (!config.passkey?.rpId || !config.passkey.rpName) {
-            return NextResponse.json({ error: "rpId and rpName is required" }, { status: 400 });
+            return errorResponse("rpId and rpName is required", 400);
         }
+        if (!verifyCsrf(req)) {
+            return errorResponse("Invalid CSRF token", 403);
+        };
 
         const { mode = 'email' } = config.passkey;
         const { adapter } = config;
@@ -22,7 +26,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
             const passkey = await adapter.getPasskeyByEmail?.(email);
 
             if (!user || !passkey || user.passkeys?.length === 0) {
-                return NextResponse.json({ error: "User not found or no passkeys registered" }, { status: 404 });
+                return errorResponse("Invalid credentials", 401);
             }
 
             const allowCredentials = passkey.map((p) => ({
@@ -46,7 +50,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
             const passkeys = await adapter.getPasskeys?.();
 
             if (!passkeys) {
-                return NextResponse.json({ error: "No passkeys found" }, { status: 404 } );
+                return errorResponse("Invalid credentials", 401);
             }
 
             const allowCredentials = passkeys.map(p => ({
@@ -71,7 +75,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
             return NextResponse.json(options, { status: 200 });
         }
     } catch (error) {
-        console.error("[INTERNAL ERROR]", error);
-        return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+        console.error("[AUTH-KIT-ERROR]", error)
+        return errorResponse();
     }
 }

@@ -3,16 +3,20 @@ import { AuthKitParams } from "../../../core/types";
 import { VerifiedAuthenticationResponse, verifyAuthenticationResponse, VerifyAuthenticationResponseOpts } from "@simplewebauthn/server";
 import { signJWT } from "../../../jwt";
 import { getCookieName } from "../../../core/lib/cookie";
-import { deleteChallenge, getChallenge } from "../../lib";
+import { deleteChallenge, errorResponse, getChallenge } from "../../lib";
+import { verifyCsrf } from "../../../middleware/lib";
 
 export async function POST(req: NextRequest, config: AuthKitParams) {
     try {
         if (!config.passkey) {
-            return NextResponse.json({ error: "Passkey config is required" }, { status: 400 });
+            return errorResponse("Passkey config is required", 400);
         }
         if (!config.passkey?.rpId || !config.passkey.rpName) {
-            return NextResponse.json({ error: "rpId and rpName is required" }, { status: 400 });
+            return errorResponse("rpId and rpName is required", 400);
         }
+        if (!verifyCsrf(req)) {
+            return errorResponse("Invalid CSRF token", 403);
+        };
 
         const { mode = 'email' } = config.passkey;
         
@@ -24,13 +28,13 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
             const passkey = await adapter.getPasskeyByEmail?.(email);
 
             if (!user || !passkey || passkey.length === 0) {
-                return NextResponse.json({ error: "User not found or no passkeys registered" }, { status: 404 });
+                return errorResponse("Invalid credentials", 401);
             }
 
             const expectedChallenge = await getChallenge(config, user.id)
 
             if (!expectedChallenge) {
-                return NextResponse.json({ error: "Challenge not found" }, { status: 400 });
+                return errorResponse("Invalid credentials", 401);
             }
 
             const incomingID = Buffer.from(credential.id, "base64url");
@@ -47,7 +51,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
             }
 
             if (!dbPasskey) {
-                return NextResponse.json({ error: "Passkey not registered for this user" }, { status: 400 });
+                return errorResponse("Invalid credentials", 401);
             }
 
             let verification: VerifiedAuthenticationResponse;
@@ -71,8 +75,8 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
                 };
                 verification = await verifyAuthenticationResponse(opts);
             } catch (error) {
-                console.error("[VERIFY AUTHENTICATION ERROR]", error);
-                return NextResponse.json({ error: (error as Error).message }, { status: 400 });
+                console.error("[AUTH-KIT-ERROR]", error)
+                return NextResponse.json({ error: 'Internal server error', success: false }, { status: 500 });
             } finally {
                 await deleteChallenge(config, user.id);
             }
@@ -108,22 +112,22 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
             const webAuthnIDBuffer = Buffer.from(credential.id, "base64url");
             const passkey = await config.adapter.getPasskeyByRaw?.(webAuthnIDBuffer);
             if (!passkey) {
-                return NextResponse.json({ error: "Passkey not found" }, { status: 404 });
+                return errorResponse("Invalid credentials", 401);
             }
 
             const user = await config.adapter.getUser?.(passkey.userId);
 
             if (!user?.passkeys) {
-                return NextResponse.json({ error: "Passkey not found" }, { status: 404 });
+                return errorResponse("Invalid credentials", 401);
             }
 
             if (!user || user.passkeys.length === 0) {
-               return NextResponse.json({ error: "User not found or no passkeys" }, { status: 404 });
+                return errorResponse("Invalid credentials", 401);
             }
 
             const expectedChallenge = await getChallenge(config, credential.id);
             if (!expectedChallenge) {
-                return NextResponse.json({ error: "Challenge not found" }, { status: 400 });
+                return errorResponse("Invalid credentials", 401);
             }
 
             const incomingID = Buffer.from(credential.id, "base64url");
@@ -135,7 +139,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
             });
 
             if (!dbPasskey) {
-            return NextResponse.json({ error: "Passkey not registered for this user" }, { status: 400 });
+                return errorResponse("Invalid credentials", 401);
             }
 
             let verification: VerifiedAuthenticationResponse;
@@ -159,8 +163,8 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
             };
             verification = await verifyAuthenticationResponse(opts);
             } catch (error) {
-                console.error("[VERIFY AUTHENTICATION ERROR]", error);
-                return NextResponse.json({ error: (error as Error).message }, { status: 400 });
+                console.error("[AUTH-KIT-ERROR]", error)
+                return NextResponse.json({ error: 'Internal server error', success: false }, { status: 500 });
             }
 
             const { verified, authenticationInfo } = verification;
@@ -191,7 +195,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
             return NextResponse.json({ verified: false });
         }
     } catch (error) {
-        console.error("[INTERNAL ERROR]", error);
-        return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+        console.error("[AUTH-KIT-ERROR]", error)
+        return errorResponse();
     }
 }

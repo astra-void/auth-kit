@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { AuthKitParams } from "../../core/types";
 import { verifyJWT } from "../../jwt";
 import { getCookieName } from "../../core/lib/cookie";
+import { errorResponse } from "../lib";
 
 export async function GET(req: NextRequest, config: AuthKitParams) {
     try {
@@ -24,7 +25,8 @@ export async function GET(req: NextRequest, config: AuthKitParams) {
         }
 
         return NextResponse.json({ user: { id: user.id, email: user.email } }, { status: 200 });
-    } catch {
-        return NextResponse.json({ user: null }, { status: 200 });
+    } catch (error) {
+        console.error("[AUTH-KIT-ERROR]", error);
+        return errorResponse();
     }
 }

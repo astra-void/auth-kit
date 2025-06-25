@@ -16,7 +16,7 @@ export async function login(params: LoginParams): Promise<User | AdapterUser | n
             window.location.href = redirectUrl
             return null;
         }
-
+        
         return req;
     } catch {
         return null;

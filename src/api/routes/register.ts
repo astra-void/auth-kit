@@ -3,28 +3,26 @@ import { AuthKitParams } from "../../core/types";
 import { hashPassword } from "../../auth";
 import { signJWT } from "../../jwt";
 import { getCookieName } from "../../core/lib/cookie";
-import { CSRF_COOKIE_NAME, verifyCsrf } from "../../middleware/lib";
+import { verifyCsrf } from "../../middleware/lib";
+import { errorResponse } from "../lib";
 
 export async function POST(req: NextRequest, config: AuthKitParams) {
     try {
         const { email, password } = await req.json();
         const { adapter, algorithm = 'argon2' } = config;
 
-        const headerToken = req.headers.get('X-CSRF-Token');
-        const cookieToken = req.cookies.get(CSRF_COOKIE_NAME)?.value;
-
-        if (!headerToken || !cookieToken || !verifyCsrf(req)) {
-            return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 })
+        if (!verifyCsrf(req)) {
+            return errorResponse("Invalid CSRF token", 403);
         };
 
         if (!email || !password) {
-            return NextResponse.json({ error: 'Email and password are required.' }, { status: 400 });
+            return errorResponse("Invalid request", 400)
         }
 
         const hashedPassword = await hashPassword(password, algorithm);
         const user = await adapter.createUser?.(email, hashedPassword);
         if (!user) {
-            return NextResponse.json({ error: "User not found" }, { status: 404 });
+            return errorResponse("Invalid credentials", 401);
         }
 
         const token = await signJWT({
@@ -35,7 +33,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
             secret: process.env.AUTHKIT_SECRET!,
         });
 
-        const res = NextResponse.json({ ok: true });
+        const res = NextResponse.json({ success: true });
         res.cookies.set(getCookieName('auth-kit.session-token'), token!, {
             httpOnly: true,
             secure: true,
@@ -45,7 +43,8 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
         });
 
         return res;
-    } catch {
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    } catch (error) {
+        console.error("[AUTH-KIT-ERROR]", error)
+        return errorResponse();
     }
 }

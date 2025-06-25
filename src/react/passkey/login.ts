@@ -1,7 +1,8 @@
-import axios from "axios";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getSession } from "./getSession";
 import { startAuthentication } from "@simplewebauthn/browser";
 import { LoginPasskeyParams } from "./types";
+import { authRequest } from "../utils";
 
 export async function loginPasskey(params?: LoginPasskeyParams) {
     try {
@@ -17,9 +18,9 @@ export async function loginPasskey(params?: LoginPasskeyParams) {
         if (params?.email) {
             const { email } = params;
 
-            const options = (await axios.post('/api/auth/login/passkey/options', { email })).data.options;
+            const options = (await authRequest<any>('POST', "/api/auth/login/passkey/options", { email }))?.options;
             const credential = await startAuthentication({ optionsJSON: options });
-            const verification = (await axios.post("/api/auth/login/passkey/verify", { email, credential })).data.success;
+            const verification = (await authRequest<any>('POST', '/api/auth/login/passkey/verify', { email, credential }))?.success;
             
             if (verification === true) {
                 if (redirect) {
@@ -32,9 +33,9 @@ export async function loginPasskey(params?: LoginPasskeyParams) {
             }
         }
 
-        const options = (await axios.post('/api/auth/login/passkey/options')).data;
+        const options = (await authRequest<any>('POST', "/api/auth/login/passkey/options"))?.options;
         const credential = await startAuthentication({ optionsJSON: options });
-        const verification = (await axios.post('/api/auth/login/passkey/verify', { credential })).data.success;
+        const verification = (await authRequest<any>('POST', '/api/auth/login/passkey/verify', { credential }))?.success;
 
         if (verification === true) {
             if (redirect) {

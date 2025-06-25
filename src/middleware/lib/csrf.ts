@@ -26,14 +26,15 @@ export function generateCsrfToken() {
 export function verifyCsrf(req: NextRequest): boolean {
     const cookieToken = req.cookies.get(getCookieName(CSRF_COOKIE_NAME))?.value;
     const headerToken = req.headers.get('X-CSRF-Token')
-    if (!cookieToken || !headerToken || cookieToken !== headerToken) return false;
+    if (!cookieToken || !headerToken || cookieToken !== headerToken || !secret) return false;
 
     const parts = cookieToken.split(':');
     if (parts.length !== 3) return false;
 
     const [token, timestampStr, hmacHex] = parts;
     const timestamp = Number(timestampStr);
-    const maxAge = 1000 * 60 * 10;
+    const maxAge = 1000 * 60 * 10; // 10 min
+    if (isNaN(timestamp)) return false;
     if (Date.now() - timestamp > maxAge) return false;
 
     const data = new TextEncoder().encode(`${token}:${timestamp}`);

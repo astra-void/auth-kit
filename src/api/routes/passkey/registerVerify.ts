@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { AuthKitParams } from "../../../core/types";
 import { VerifiedRegistrationResponse, verifyRegistrationResponse, VerifyRegistrationResponseOpts } from "@simplewebauthn/server";
 import { getSession } from "../../../auth/lib/session";
-import { deleteChallenge, getChallenge } from "../../lib";
+import { deleteChallenge, errorResponse, getChallenge } from "../../lib";
+import { verifyCsrf } from "../../../middleware/lib";
 
 function decodeBase64Url(input: string): Uint8Array {
     const base64 = input.replace(/-/g, "+").replace(/_/g, "/");
@@ -12,21 +13,27 @@ function decodeBase64Url(input: string): Uint8Array {
 
 export async function POST(req: NextRequest, config: AuthKitParams) {
     try {
-        if (!config.passkey?.rpId || !config.passkey.rpName) {
-            return NextResponse.json({ error: "rpId and rpName is required" });
+        if (!config.passkey) {
+            return errorResponse("Passkey config is required", 400);
         }
+        if (!config.passkey?.rpId || !config.passkey.rpName) {
+            return errorResponse("rpId and rpName is required", 400);
+        }
+        if (!verifyCsrf(req)) {
+            return errorResponse("Invalid CSRF token", 403);
+        };
 
         const { credential } = await req.json();
 
         const user = await getSession(config)
 
         if (!user) {
-            return NextResponse.json({ error: "Not logged in" }, { status: 401 });
+            return errorResponse("Authentication required", 401);
         }
 
         const expectedChallenge = await getChallenge(config, user.id);
         if (!expectedChallenge) {
-            return NextResponse.json({ error: "Challenge not found" }, { status: 400 });
+            return errorResponse("Invalid credentials", 401);
         }
 
         let verified = false;
@@ -43,15 +50,14 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
             const verification = await verifyRegistrationResponse(opts);
             verified = verification.verified;
             registrationInfo = verification.registrationInfo;
-        } catch (error) {
-            console.error("[VERIFY REGISTRATION ERROR]", error);
-            return NextResponse.json({ error: (error as Error).message }, { status: 400 });
+        } catch {
+            return errorResponse("Invalid credentials", 401);
         } finally {
             await deleteChallenge(config, user.id);
         }
 
         if (!verified || !registrationInfo) {
-            return NextResponse.json({ error: "Verification failed" }, { status: 400 });
+            return errorResponse("Invalid credentials", 401);
         }
 
         const { credential: cred } = registrationInfo;
@@ -63,7 +69,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
             ? decodeBase64Url(cred.id)
             : new Uint8Array(cred.id);
         } catch {
-            return NextResponse.json({ error: "Invalid credential ID" }, { status: 400 });
+            return errorResponse("Invalid credentials", 401);
         }
 
         const publicKey = Buffer.from(cred.publicKey);
@@ -78,7 +84,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
 
         return NextResponse.json({ success: true });
     } catch (error) {
-        console.error("[INTERNAL ERROR]", error);
-        return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+        console.error("[AUTH-KIT-ERROR]", error)
+        return errorResponse();
     }
 }

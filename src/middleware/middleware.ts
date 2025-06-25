@@ -3,9 +3,6 @@ import { MiddlewareParams } from "./types";
 import { getCookieName } from "./lib/cookie";
 import { CSRF_COOKIE_NAME, generateCsrfToken } from "./lib";
 
-const isProduction = typeof process !== 'undefined' &&
-                     process.env.NODE_ENV === 'production';
-
 export function AuthKitMiddleware(config: MiddlewareParams) {
     return function middleware(req: NextRequest) {
         const { pathname } = req.nextUrl;
@@ -36,7 +33,7 @@ export function AuthKitMiddleware(config: MiddlewareParams) {
         res.cookies.set(cookieName, token, {
             httpOnly: false,
             sameSite: 'strict',
-            secure: isProduction,
+            secure: true,
             path: '/',
             maxAge: 60 * 15
         });
