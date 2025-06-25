@@ -3,7 +3,7 @@ import { ChallengeStore } from "../core";
 const PREFIX = "passkey:challenge";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function RedisChallengeStore(redis: any): Promise<ChallengeStore> {
+export function RedisChallengeStore(redis: any): ChallengeStore {
     return {
         get: async (userId) => {
             const key = `${PREFIX}:${userId}`;
