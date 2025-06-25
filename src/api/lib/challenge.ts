@@ -43,6 +43,8 @@ export async function deleteChallenge(config: AuthKitParams, userId: string): Pr
     switch (store) {
         case 'memory':
             return await deleteChallengeMap(userId);
+        case 'redis':
+            return await config.passkey.challengeStore?.delete(userId);
         case 'custom':
             return await challengeStore?.delete(userId);
         default:
