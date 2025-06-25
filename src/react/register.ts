@@ -1,6 +1,6 @@
 import { RegisterParams } from "./types";
 import { User } from "./hooks";
-import { AdapterUser } from "../adapter";
+import { AdapterUser } from "../adapters";
 import { authRequest } from "./utils";
 
 export async function register(params: RegisterParams): Promise<User | AdapterUser | null> {

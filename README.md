@@ -3,173 +3,96 @@
 [![npm](https://img.shields.io/npm/v/@astra-void/auth-kit)](https://www.npmjs.com/package/@astra-void/auth-kit)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-> Next.js authentication with passkey support
+> 🔐 Next.js authentication with passkey support.
 > While core features are stable, APIs may change before v1.0.0.
 
----
-
-## Security Note
-⚠️ This library handles sensitive authentication logic. Please review and test carefully before using in production.
+**@astra-void/auth-kit** is an authentication kit for Next.js, supporting both traditional email/password and modern passkey (WebAuthn) login flows. Designed for flexibility, it works with any database via adapter-based architecture.   
 
 ---
 
-## 🚀 Getting Started
+## Features
 
-### 1. Install
+* ✅ Email + Password login
+* ✅ Passkey (WebAuthn) support
+* ✅ JWT cookie-based sessions
+* ✅ Adapter system (Prisma, custom, etc.)
+* ✅ Middleware for protected routes
+* ✅ Lightweight and database-agnostic
+
+---
+
+## Installation
 
 ```bash
-npm install @astra-void/auth-kit
-```
-
-or
-
-```bash
+npm i @astra-void/auth-kit
+# or
 pnpm add @astra-void/auth-kit
 ```
 
-### 2. Directory Structure
+---
 
-Set up your project like this:
+## Quick Start
 
-```txt
-📂 your-nextjs-app
-│ app/
-│  └─ api/
-│     └─ auth/
-│        └─ [...authkit]/
-│           └─ route.ts
-└─ middleware.ts
+> This example uses [Prisma](https://www.prisma.io/).
+
+### 1. API Route
+
+```ts
+// app/api/auth/[...authkit]/route.ts
+import { AuthKit } from '@astra-void/auth-kit';
+import { PrismaAdapter } from '@astra-void/auth-kit/adapters';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+const handler = AuthKit({
+  adapter: PrismaAdapter(prisma),
+});
+
+export { handler as GET, handler as POST };
+```
+
+### 2. Middleware Setup
+
+```ts
+// middleware.ts
+import { AuthKitMiddleware } from '@astra-void/auth-kit/middleware';
+
+const middleware = AuthKitMiddleware({
+  protectedRoutes: ['dashboard'], // Protect pages under /dashboard
+});
+
+export { middleware };
+
+export const config = {
+  matcher: ['/((?!api|_next/static|favicon.ico).*)'],
+};
+```
+
+### 3. Client Hook
+
+```ts
+import { useSession } from '@astra-void/auth-kit/react';
+import { useRouter } from 'next/navigation';
+
+const { data: user, status } = useSession();
+const router = useRouter();
+
+if (status === 'loading') return <p>Loading...</p>;
+if (status === 'unauthenticated') router.push('/login');
+
+return <p>Welcome {user?.email}!</p>;
 ```
 
 ---
 
-## ⚙️ Setup
+## 🧪 Example Schema
 
-### `app/api/auth/[...authkit]/route.ts`
-
-```ts
-import { Adapter, AuthKit } from "@astra-void/auth-kit";
-
-const handler = AuthKit({
-  adapter: YourAdapter, // Provide your own adapter
-});
-
-export { handler as GET, handler as POST };
-```
-
-## If you want to use passkey
-```ts
-const handler = AuthKit({
-    adapter: PrismaAdapter(prisma),
-    passkey: {
-        rpId: "localhost",
-        rpName: "Passkey",
-        mode: "credential",
-        challengeStore: YourChallengeStore
-    }
-});
-
-export { handler as GET, handler as POST };
-```
-
-## Challenge Store interface
-```ts
-export interface ChallengeStore {
-    get: (userId: string) => Promise<string | null>;
-    set: (userId: string, challenge: string) => Promise<void>;
-    delete: (userId: string) => Promise<void>;
-}
-```
-
-## Example for Redis
-```ts
-import { ChallengeStore } from "@astra-void/auth-kit";
-
-const PREFIX = "passkey:challenge";
-
-const RedisChallengeStore: ChallengeStore = {
-    get: async (userId) => {
-        const key = `${PREFIX}:${userId}`;
-        return await redis.get(key);
-    },
-
-    set: async (userId, challenge) => {  
-        const key = `${PREFIX}:${userId}`;
-        await redis.set(key, challenge, "EX", 300);
-        return;
-    },
-
-    delete: async (userId) => {
-        const key = `${PREFIX}:${userId}`;
-        await redis.del(key);
-    }
-};
-```
-
-### Adapter Types
-```ts
-export interface Adapter {
-    createUser?: (email: string, hashedPassword: string, username?: string) => Promise<AdapterUser>;
-    getUser?: (id: string) => Promise<AdapterUser | null>;
-    getUserByEmail?: (email: string) => Promise<AdapterUser | null>;
-    updateUser?: (userId: string, data: Partial<AdapterUser>) => Promise<AdapterUser>;
-    deleteUser?: (userId: string) => Promise<null>;
-    createPasskey?: (userId: string, webAuthnId: Buffer, publicKey: Buffer, transports: string) => Promise<Passkey>;
-    getPasskey?: (userId: string) => Promise<Passkey[] | null>;
-    getPasskeyByEmail?: (email: string) => Promise<Passkey[] | null>;
-    updatePasskey?: (passkeyId: string, data: Partial<Passkey>) => Promise<Passkey>;
-    deletePasskey?: (userId: string) => Promise<null>;
-}
-```
-
-### User interface
-```ts
-export interface User {
-    id: string;
-    email?: string;
-    hashedPassword?: string;
-    createdAt: Date;
-    updatedAt: Date;
-}
-```
-also Adapter User interface
-```ts
-export interface AdapterUser extends User {
-    passkeys?: Passkey[]
-}
-```
-
-### Passkey interface 
-```ts
-export interface Passkey {
-    id: string;
-    publicKey: Buffer;
-    userId: string;
-    webAuthnId: Buffer;
-    counter: number;
-    transports: string;
-    createdAt: Date;
-    updatedAt: Date;
-}
-```
-
-### Use default Prisma Adapter
-```ts
-import { PrismaAdapter } from "@astra-void/auth-kit/adapter";
-
-const handler = AuthKit({
-    adapter: PrismaAdapter(prisma),
-});
-```
-
-#### Prisma schema for default Prisma Adapter
-```ts
+```prisma
 model User {
   id             String    @id @default(uuid())
   email          String    @unique
   hashedPassword String
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
   passkeys       Passkey[]
 }
 
@@ -178,133 +101,27 @@ model Passkey {
   publicKey  Bytes
   userId     String
   webAuthnId Bytes    @unique
-  counter    Int      @default(0)
   transports String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id])
-
-  @@index([userId])
+  counter    Int
+  user       User     @relation(fields: [userId], references: [id])
 }
 ```
-+ This Prisma schema is written for SQL-based databases (e.g. PostgreSQL, MySQL).
 
 ---
 
-### `middleware.ts`
+## Documentation
 
-This middleware enables CSRF protection and guards protected routes.
-
-```ts
-import { AuthKitMiddleware } from "@astra-void/auth-kit/middleware";
-
-const middleware = AuthKitMiddleware({
-  loginPath: '/login', // default: '/login'
-  logoutPath: '/logout', // default: '/logout'
-  registerPath: '/register', // default: '/register'
-  protectedRoutes: ['dashboard'], // protected routes
-  alwaysSetToken: false, // default: false
-});
-
-export { middleware };
-```
+Full docs & API reference →
+👉 [https://auth-kit-documentation.vercel.app](https://auth-kit-documentation.vercel.app)
 
 ---
 
-## 🧐 Client Usage
+## Customization
 
-### Login
-
-```ts
-import { login } from '@astra-void/auth-kit/react';
-
-await login({ email: 'test@example.com', password: '12345678' });
-```
-
-### Logout
-
-```ts
-import { logout } from '@astra-void/auth-kit/react';
-
-await logout();
-```
-
-### Register
-
-```ts
-import { register } from '@astra-void/auth-kit/react';
-
-await register({ email: 'test@example.com', password: '12345678' });
-```
-
-### Login with Passkey
-```ts
-import { loginPasskey } from "@astra-void/auth-kit/react/passkey";
-
-await loginPasskey({ email: 'test@example.com' });
-```
-## If you are using credential
-```ts
-import { loginPasskey } from "@astra-void/auth-kit/react/passkey";
-
-await loginPasskey();
-```
-
-### Register new Passkey (should logged in)
-```ts
-import { registerPasskey } from "@astra-void/auth-kit/react/passkey";
-
-await registerPasskey();
-```
-
-### Session Hook
-
-```ts
-const { data: user, status } = useSession();
-
-if (status === "loading") return <Spinner />;
-if (status === "unauthenticated") router.push("/login");
-
-return <p>Welcome {user?.email}!</p>;
-```
-+ The status is 'authenticated' | 'unauthenticated' | 'loading';
-
-### Import Map
-```ts
-// Setup
-import { AuthKit } from "@astra-void/auth-kit";
-
-// Middleware
-import { AuthKitMiddleware } from "@astra-void/auth-kit/middleware";
-
-// Client API
-import { login, logout } from "@astra-void/auth-kit/react";
-
-// Passkey client API
-import { loginPasskey } from "@astra-void/auth-kit/react/passkey";
-```
+Want to use your own DB? Check out the [Adapters Guide](https://auth-kit-documentation.vercel.app/adapters/overview) to build a custom adapter.
 
 ---
 
-## 🧰 Features
+## License
 
-* ✅ Email/Password/Passkey Authentication
-* 🔒 Automatic CSRF Protection
-* 🍪 JWT-based Sessions
-* 🔀 Middleware Route Protection
-* ⚙️ Provider support (coming soon)
-* 🔌 Adapter support: Prisma (only)
-
----
-
-## 📌 Roadmap
-
-* [ ] Social login (Google, GitHub, etc.)
-* [ ] More adapter support: Drizzle, etc.
-
----
-
-## 📜 License
-
-MIT © astra-void
+MIT © [@astra-void](https://github.com/astra-void)

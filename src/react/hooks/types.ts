@@ -1,4 +1,4 @@
-import { AdapterUser } from "../../adapter";
+import { AdapterUser } from "../../adapters";
 
 export interface User {
     id: string;

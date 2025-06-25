@@ -1,6 +1,6 @@
 import { LoginParams } from "./types";
 import { User } from "./hooks";
-import { AdapterUser } from "../adapter";
+import { AdapterUser } from "../adapters";
 import { authRequest } from "./utils";
 
 export async function login(params: LoginParams): Promise<User | AdapterUser | null> {

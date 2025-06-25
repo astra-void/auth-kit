@@ -1,4 +1,4 @@
-import { Adapter } from "../adapter";
+import { Adapter } from "../adapters";
 import { HashingAlgorithm } from "../auth";
 
 export interface ChallengeStore {

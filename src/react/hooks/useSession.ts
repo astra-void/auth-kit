@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { AdapterUser } from "../../adapter";
+import { AdapterUser } from "../../adapters";
 import { SessionStatus, User, UseSessionResult } from "./types";
 import axios from "axios";
 
