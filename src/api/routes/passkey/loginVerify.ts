@@ -27,7 +27,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
                 return NextResponse.json({ error: "User not found or no passkeys registered" }, { status: 404 });
             }
 
-            const expectedChallenge = await getChallenge(config, credential.id)
+            const expectedChallenge = await getChallenge(config, user.id)
 
             if (!expectedChallenge) {
                 return NextResponse.json({ error: "Challenge not found" }, { status: 400 });
