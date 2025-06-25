@@ -12,6 +12,8 @@ export interface User {
 export type SessionStatus = 'authenticated' | 'unauthenticated' | 'loading';
 
 export interface UseSessionResult {
-  data: User | AdapterUser | null;
-  status: SessionStatus;
+  data: {
+    user: User | AdapterUser | null;
+    status: SessionStatus;  
+  }
 }

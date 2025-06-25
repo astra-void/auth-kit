@@ -38,5 +38,5 @@ export function useSession(): UseSessionResult {
         }
     }, []);
 
-    return { data: user, status };
+    return { data: { user, status } };
 }
