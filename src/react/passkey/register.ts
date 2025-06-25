@@ -1,6 +1,7 @@
-import axios from "axios";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getSession } from "./getSession";
 import { startRegistration } from "@simplewebauthn/browser";
+import { authRequest } from "../utils";
 
 export async function registerPasskey() {
     try {
@@ -10,7 +11,7 @@ export async function registerPasskey() {
             throw Error("Session not found")
         }
         
-        const options = (await axios.post('/api/auth/register/passkey/options', { userId: session?.id })).data.options;
+        const options = (await authRequest<any>('POST', '/api/auth/register/passkey/options', { userId: session.id }))?.options;
         
         let attResp;
         try {
@@ -19,11 +20,9 @@ export async function registerPasskey() {
             return;
         }
 
-        const verifyResponse = await axios.post('/api/auth/register/passkey/verify', {
-            credential: attResp,
-        });
+        const verification = (await authRequest<any>('POST', '/api/auth/register/passkey/verify', { credential: attResp }))?.success;
 
-        if (verifyResponse.data.verified) {
+        if (verification) {
             return true;
         }
         
