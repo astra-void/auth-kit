@@ -17,12 +17,7 @@ export async function POST(req: NextRequest) {
         }
 
         const res = NextResponse.json({ message: "Logged out", success: true }, { status: 200 });
-        res.cookies.set(getCookieName('auth-kit.session-token'), "", {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: 0,
-        });
+        res.cookies.delete(getCookieName('auth-kit.session-token'))
 
         return res;
     } catch (error) {
