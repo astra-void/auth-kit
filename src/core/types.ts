@@ -1,5 +1,6 @@
 import { Adapter } from "../adapters";
 import { HashingAlgorithm } from "../auth";
+import { Provider } from "../providers";
 
 export interface ChallengeStore {
     get: (userId: string) => Promise<string | null>;
@@ -9,6 +10,7 @@ export interface ChallengeStore {
 
 export interface AuthKitParams {
     adapter: Adapter;
+    providers: Provider[];
     algorithm?: HashingAlgorithm;
     passkey?: {
         rpId: string;

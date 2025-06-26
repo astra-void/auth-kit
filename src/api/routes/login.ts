@@ -1,30 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AuthKitParams } from "../../core/types";
-import { verifyPassword } from "../../auth";
 import { signJWT } from "../../jwt";
 import { getCookieName } from "../../core/lib/cookie";
 import { verifyCsrf } from "../../middleware/lib";
 import { errorResponse } from "../lib";
+import { AdapterUser } from "../../adapters";
 
 export async function POST(req: NextRequest, config: AuthKitParams) {  
     try {
-        const { email, password } = await req.json();
+        const { provider } = await req.json();
 
         if (!verifyCsrf(req)) {
             return errorResponse("Invalid CSRF token", 403);
         };
 
-        if (!email || !password) {
-            return errorResponse("Invalid request", 400)
+        const selectedProvider = config.providers.find(p => p.name === provider);
+        if (!selectedProvider) {
+            return errorResponse("Unknown provider", 400);
         }
 
-        const user = await config.adapter.getUserByEmail?.(email);
+        let user: AdapterUser | null = null;
+        try {
+            user = await selectedProvider.authorize(req);
+        } catch { /* empty */ }
         if (!user) {
-            return errorResponse("Invalid credentials", 401);
-        }
-
-        const compare = await verifyPassword(password, user.hashedPassword!);
-        if (!compare) {
             return errorResponse("Invalid credentials", 401);
         }
 

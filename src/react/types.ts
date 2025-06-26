@@ -1,6 +1,7 @@
 export interface LoginParams {
     email: string;
     password: string;
+    provider: string;
     redirect?: boolean;
     redirectUrl?: string;
 }

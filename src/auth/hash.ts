@@ -1,6 +1,6 @@
-import argon2 from "argon2";
 import { HashingAlgorithm } from ".";
 
+let argon2: typeof import("argon2") | null = null;
 let bcrypt: typeof import("bcrypt") | null = null;
 
 export async function hashPassword(password: string, algorithm: HashingAlgorithm = 'argon2'): Promise<string | null> {
@@ -15,7 +15,14 @@ export async function hashPassword(password: string, algorithm: HashingAlgorithm
                 return null;
             }
         case 'argon2':
-            return argon2.hash(password);
+            try {
+                const mod = await import("argon2");
+                argon2 = mod;
+                return argon2.hash(password);
+            } catch {
+                console.error("[AUTH-KIT-ERROR] Failed to hash password. Have you installed `argon2`?");
+                return null;
+            }
     }
 }
 
@@ -31,6 +38,13 @@ export async function verifyPassword(password: string, hash: string, algorithm: 
                 return null;
             }
         case 'argon2':
-            return argon2.verify(hash, password);
+            try {
+                const mod = await import("argon2");
+                argon2 = mod;
+                return argon2.verify(hash, password);
+            } catch {
+                console.error("[AUTH-KIT-ERROR] Failed to hash password. Have you installed `argon2`?");
+                return null;
+            }
     }
 }
