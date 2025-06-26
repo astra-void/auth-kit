@@ -83,7 +83,10 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
 
             const { verified, authenticationInfo } = verification;
             if (verified) {
-                await adapter.updatePasskey?.(dbPasskey.id, { counter: authenticationInfo.newCounter });
+                const newCounter = authenticationInfo.newCounter;
+                if (newCounter > dbPasskey.counter) {
+                    await adapter.updatePasskey?.(dbPasskey.id, { counter: newCounter });
+                }
 
                 const token = await signJWT({
                     payload: {
@@ -108,14 +111,15 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
         }
         if (mode === 'credential') {
             const { credential } = await req.json();
+            const { adapter } = config;
 
             const webAuthnIDBuffer = Buffer.from(credential.id, "base64url");
-            const passkey = await config.adapter.getPasskeyByRaw?.(webAuthnIDBuffer);
+            const passkey = await adapter.getPasskeyByRaw?.(webAuthnIDBuffer);
             if (!passkey) {
                 return errorResponse("Invalid credentials", 401);
             }
 
-            const user = await config.adapter.getUser?.(passkey.userId);
+            const user = await adapter.getUser?.(passkey.userId);
 
             if (!user?.passkeys) {
                 return errorResponse("Invalid credentials", 401);
@@ -169,8 +173,11 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
 
             const { verified, authenticationInfo } = verification;
             if (verified) {
-                await config.adapter.updatePasskey?.(dbPasskey.id, { counter: authenticationInfo.newCounter });
-
+                const newCounter = authenticationInfo.newCounter;
+                if (newCounter > dbPasskey.counter) {
+                    await adapter.updatePasskey?.(dbPasskey.id, { counter: newCounter });
+                }
+        
                 const token = await signJWT({
                     payload: {
                         sub: user.id,
