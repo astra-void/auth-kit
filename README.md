@@ -10,6 +10,13 @@
 
 ---
 
+## Documentation
+
+Full docs →
+👉 [https://auth-kit-documentation.vercel.app](https://auth-kit-documentation.vercel.app)
+
+---
+
 ## Features
 
 * ✅ Email + Password login
@@ -106,13 +113,6 @@ model Passkey {
   user       User     @relation(fields: [userId], references: [id])
 }
 ```
-
----
-
-## Documentation
-
-Full docs →
-👉 [https://auth-kit-documentation.vercel.app](https://auth-kit-documentation.vercel.app)
 
 ---
 

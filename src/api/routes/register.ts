@@ -20,6 +20,8 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
         }
 
         const hashedPassword = await hashPassword(password, algorithm);
+        if (!hashedPassword) return errorResponse();
+        
         const user = await adapter.createUser?.(email, hashedPassword);
         if (!user) {
             return errorResponse("Invalid credentials", 401);

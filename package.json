@@ -1,6 +1,6 @@
 {
   "name": "@astra-void/auth-kit",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Next.js authentication with passkey support",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -67,7 +67,6 @@
     "react-dom": "^19.1.0"
   },
   "optionalDependencies": {
-    "argon2": "^0.43.0",
     "bcrypt": "^6.0.0"
   },
   "devDependencies": {
@@ -99,6 +98,7 @@
     "@panva/hkdf": "^1.2.1",
     "@simplewebauthn/browser": "^13.1.0",
     "@simplewebauthn/server": "^13.1.1",
+    "argon2": "^0.43.0",
     "axios": "^1.10.0",
     "jose": "^6.0.11",
     "uuid": "^11.1.0"
