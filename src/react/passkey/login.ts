@@ -18,9 +18,9 @@ export async function loginPasskey(params?: LoginPasskeyParams) {
         if (params?.email) {
             const { email } = params;
 
-            const options = (await authRequest<any>('POST', "/api/auth/login/passkey/options", { email }))?.options;
+            const options = (await authRequest<any>('POST', "/api/auth/login/passkey/options", { email }))?.data.options;
             const credential = await startAuthentication({ optionsJSON: options });
-            const verification = (await authRequest<any>('POST', '/api/auth/login/passkey/verify', { email, credential }))?.success;
+            const verification = (await authRequest<any>('POST', '/api/auth/login/passkey/verify', { email, credential }))?.data.success;
             
             if (verification === true) {
                 if (redirect) {
@@ -33,9 +33,9 @@ export async function loginPasskey(params?: LoginPasskeyParams) {
             }
         }
 
-        const options = (await authRequest<any>('POST', "/api/auth/login/passkey/options"))?.options;
+        const options = (await authRequest<any>('POST', "/api/auth/login/passkey/options"))?.data.options;
         const credential = await startAuthentication({ optionsJSON: options });
-        const verification = (await authRequest<any>('POST', '/api/auth/login/passkey/verify', { credential }))?.success;
+        const verification = (await authRequest<any>('POST', '/api/auth/login/passkey/verify', { credential }))?.data.success;
 
         if (verification === true) {
             if (redirect) {

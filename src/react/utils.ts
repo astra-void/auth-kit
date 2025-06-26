@@ -21,7 +21,7 @@ export async function authRequest<T>(
   method: "POST" | "GET" | "PUT" | "DELETE",
   url: string,
   data?: object
-): Promise<T | null> {
+): Promise<{ data: T, status: number } | null> {
   try {
     const csrfToken = getCsrfTokenFromCookie();
     if (!csrfToken) {
@@ -38,7 +38,7 @@ export async function authRequest<T>(
       withCredentials: true,
     });
 
-    return res.data;
+    return { data: res.data, status: res.status };
   } catch {
     return null;
   }

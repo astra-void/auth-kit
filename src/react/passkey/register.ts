@@ -11,7 +11,7 @@ export async function registerPasskey() {
             throw Error("Session not found")
         }
         
-        const options = (await authRequest<any>('POST', '/api/auth/register/passkey/options', { userId: session.id }))?.options;
+        const options = (await authRequest<any>('POST', '/api/auth/register/passkey/options', { userId: session.id }))?.data.options;
         
         let attResp;
         try {
@@ -20,7 +20,7 @@ export async function registerPasskey() {
             return;
         }
 
-        const verification = (await authRequest<any>('POST', '/api/auth/register/passkey/verify', { credential: attResp }))?.success;
+        const verification = (await authRequest<any>('POST', '/api/auth/register/passkey/verify', { credential: attResp }))?.data.success;
 
         if (verification) {
             return true;

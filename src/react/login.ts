@@ -12,12 +12,16 @@ export async function login(params: LoginParams): Promise<User | AdapterUser | n
             { email, password }
         );
 
+        if (!req?.data || req.status !== 200) {
+            return null;
+        }
+
         if (redirect) {
             window.location.href = redirectUrl
             return null;
         }
         
-        return req;
+        return req.data;
     } catch {
         return null;
     }
