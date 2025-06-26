@@ -72,7 +72,7 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
                 )
             );
 
-            return NextResponse.json(options, { status: 200 });
+            return NextResponse.json({ options }, { status: 200 });
         }
     } catch (error) {
         console.error("[AUTH-KIT-ERROR]", error)
