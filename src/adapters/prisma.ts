@@ -1,3 +1,4 @@
+import { getGlobalConfig } from "../core";
 import { Adapter, AdapterUser, Passkey } from "./types";
 
 function mapUser(user: AdapterUser): AdapterUser {
@@ -51,6 +52,8 @@ function mapPasskeys(passkeys: Passkey[]): Passkey[] {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function PrismaAdapter(prisma: any): Adapter {
+  const config = getGlobalConfig();
+
   return {
     createUser: async (email, hashedPassword, username) => {
       const data: { email: string; hashedPassword: string; username?: string } = { email, hashedPassword };
@@ -60,6 +63,13 @@ export function PrismaAdapter(prisma: any): Adapter {
     },
 
     getUser: async (id) => {
+      if (!config?.passkey) {
+        const user = await prisma.user.findUnique({
+          where: { id },
+        });
+        return user ? mapUser(user) : null;
+      }
+
       const user = await prisma.user.findUnique({
         where: { id },
         include: { passkeys: true },
@@ -68,6 +78,13 @@ export function PrismaAdapter(prisma: any): Adapter {
     },
 
     getUserByEmail: async (email) => {
+      if (!config?.passkey) {
+        const user = await prisma.user.findUnique({
+          where: { email },
+        });
+        return user ? mapUser(user) : null;
+      }
+      
       const user = await prisma.user.findUnique({
         where: { email },
         include: { passkeys: true },
