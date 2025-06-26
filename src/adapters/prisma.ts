@@ -55,10 +55,15 @@ export function PrismaAdapter(prisma: any): Adapter {
 
   return {
     createUser: async (email, hashedPassword, username) => {
-      const data: { email: string; hashedPassword: string; username?: string } = { email, hashedPassword };
-      if (username) data.username = username;
-      const user = await prisma.user.create({ data })
-      return mapUser(user);
+      try {
+        const data: { email: string; hashedPassword: string; username?: string } = { email, hashedPassword };
+        if (username) data.username = username;
+        const user = await prisma.user.create({ data })
+        return mapUser(user);
+      } catch (error) {
+        console.error("[AUTH-KIT-ERROR] Failed to create user", error);
+        throw new Error("Failed to create user");
+      }
     },
 
     getUser: async (id) => {
