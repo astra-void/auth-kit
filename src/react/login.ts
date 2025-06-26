@@ -3,9 +3,9 @@ import { User } from "./hooks";
 import { AdapterUser } from "../adapters";
 import { authRequest } from "./utils";
 
-export async function login(params: LoginParams): Promise<User | AdapterUser | null> {
+export async function login(provider: string, params: LoginParams): Promise<User | AdapterUser | null> {
     try {
-        const { email, password, provider, redirect = true, redirectUrl = '/' } = params;
+        const { email, password, redirect = true, redirectUrl = '/' } = params;
         const req = await authRequest<User | AdapterUser | null>(
             "POST", 
             "/api/auth/login", 
