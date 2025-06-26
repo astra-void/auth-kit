@@ -60,7 +60,11 @@ export function PrismaAdapter(prisma: any): Adapter {
         if (username) data.username = username;
         const user = await prisma.user.create({ data })
         return mapUser(user);
-      } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        if (error?.code === 'P2002') {
+          throw new Error("User already exists");
+        }
         console.error("[AUTH-KIT-ERROR] Failed to create user", error);
         throw new Error("Failed to create user");
       }
