@@ -1,6 +1,6 @@
 {
   "name": "@astra-void/auth-kit",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Next.js authentication with passkey support",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -62,11 +62,13 @@
   "author": "astra-void",
   "license": "MIT",
   "peerDependencies": {
-    "argon2": "^0.43.0",
-    "bcrypt": "^6.0.0",
     "next": "^15.3.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
+  },
+  "optionalDependencies": {
+    "argon2": "^0.43.0",
+    "bcrypt": "^6.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.27.4",
