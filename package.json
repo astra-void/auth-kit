@@ -67,13 +67,11 @@
   "author": "astra-void",
   "license": "MIT",
   "peerDependencies": {
+    "argon2": "^0.43.0",
+    "bcrypt": "^6.0.0",
     "next": "^15.3.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
-  },
-  "optionalDependencies": {
-    "argon2": "^0.43.0",
-    "bcrypt": "^6.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.27.4",

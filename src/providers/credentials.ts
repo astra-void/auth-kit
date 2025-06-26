@@ -14,6 +14,7 @@ export function CredentialsProvider(
         const { email, password } = await req.json();
         if (!email || !password) return null;
 
+        // TODO: FIX THIS THINGS: NO USER FOUND WHEN LOGIN WITH THIS PROVIDER CODE 401,
         const user = await config.adapter.getUserByEmail?.(email);
         if (!user || !user.hashedPassword) return null;
 
