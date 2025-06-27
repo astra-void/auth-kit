@@ -1,4 +1,4 @@
-import { getGlobalConfig } from "../core";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Adapter, AdapterUser, Passkey } from "./types";
 
 function mapUser(user: AdapterUser): AdapterUser {
@@ -50,9 +50,7 @@ function mapPasskeys(passkeys: Passkey[]): Passkey[] {
     }));
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function PrismaAdapter(prisma: any): Adapter {
-
   return {
     createUser: async (email, hashedPassword, username) => {
       try {
@@ -60,7 +58,6 @@ export function PrismaAdapter(prisma: any): Adapter {
         if (username) data.username = username;
         const user = await prisma.user.create({ data })
         return mapUser(user);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         if (error?.code === 'P2002') {
           throw new Error("User already exists");
@@ -71,14 +68,6 @@ export function PrismaAdapter(prisma: any): Adapter {
     },
 
     getUser: async (id) => {
-      const config = getGlobalConfig();
-      if (!config?.passkey) {
-        const user = await prisma.user.findUnique({
-          where: { id },
-        });
-        return user ? mapUser(user) : null;
-      }
-
       const user = await prisma.user.findUnique({
         where: { id },
         include: { passkeys: true },
@@ -87,14 +76,6 @@ export function PrismaAdapter(prisma: any): Adapter {
     },
 
     getUserByEmail: async (email) => {
-      const config = getGlobalConfig();
-      if (!config?.passkey) {
-        const user = await prisma.user.findUnique({
-          where: { email },
-        });
-        return user ? mapUser(user) : null;
-      }
-
       const user = await prisma.user.findUnique({
         where: { email },
         include: { passkeys: true },

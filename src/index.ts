@@ -1,1 +1,2 @@
-export { AuthKit, ChallengeStore } from "./core";
+export { AuthKit } from "./core";
+export { ChallengeStore } from "./providers";

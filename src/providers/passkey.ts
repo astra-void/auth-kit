@@ -1,18 +1,28 @@
-import { getChallenge } from "../api/lib";
+import { VerifiedRegistrationResponse, verifyRegistrationResponse, VerifyRegistrationResponseOpts } from "@simplewebauthn/server";
+import { deleteChallenge, getChallenge } from "../api/lib";
 import { verifyCredential } from "../api/lib/passkey";
+import { getSession } from "../auth/lib/session";
 import { getGlobalConfig } from "../core";
-import { Provider } from "./types";
+import { PasskeyProviderParams, Provider } from "./types";
 
-export function PasskeyProvider(): Provider {
+function decodeBase64Url(input: string): Uint8Array {
+    const base64 = input.replace(/-/g, "+").replace(/_/g, "/");
+    const binary = Buffer.from(base64, "base64");
+    return new Uint8Array(binary);
+}
+
+export function PasskeyProvider(params: PasskeyProviderParams): Provider {
     return {
         name: "passkey",
         type: "passkey",
+        config: params,
         authorize: async (body) => {
             try {
                 const config = getGlobalConfig();
-                if (!config?.passkey) return null;
+                if (!config) return null;
 
-                const { mode = 'email' } = config.passkey;
+                const { mode = 'email'} = params;
+
                 if (mode === 'email') {
                     const { email, credential } = body;
                     const { adapter } = config;
@@ -24,33 +34,17 @@ export function PasskeyProvider(): Provider {
                         return null
                     }
         
-                    const expectedChallenge = await getChallenge(config, user.id)
+                    const expectedChallenge = await getChallenge(params, user.id)
         
                     if (!expectedChallenge) {
                         return null;
                     }
-        
-                    const incomingID = Buffer.from(credential.id, "base64url");
-                    let dbPasskey = null;
-        
-                    for (const p of passkey) {
-                        const savedID = typeof p.webAuthnId === "string"
-                            ? Buffer.from(p.webAuthnId, "base64url")
-                            : Buffer.from(p.webAuthnId);
-                        if (savedID.equals(incomingID)) {
-                            dbPasskey = p;
-                            break;
-                        }
-                    }
-        
-                    if (!dbPasskey) {
-                        return null;
-                    }
 
                     const origin = process.env.AUTHKIT_ORIGN!;
-                    const verification = await verifyCredential(credential, dbPasskey, expectedChallenge, origin, config, user.id);
-                    if (!verification) return null;
+                    const response = await verifyCredential(credential, passkey, expectedChallenge, origin, params, user.id);
+                    if (!response) return null;
 
+                    const { verification, passkey: dbPasskey } = response;
                     const { verified, authenticationInfo } = verification;
                     if (verified) {
                         const newCounter = authenticationInfo.newCounter;
@@ -83,34 +77,23 @@ export function PasskeyProvider(): Provider {
                         return null;
                     }
         
-                    const expectedChallenge = await getChallenge(config, credential.id);
+                    const expectedChallenge = await getChallenge(params, credential.id);
                     if (!expectedChallenge) {
                         return null;
                     }
         
-                    const incomingID = Buffer.from(credential.id, "base64url");
-                    const dbPasskey = user.passkeys.find(p => {
-                    const savedID = Buffer.isBuffer(p.webAuthnId)
-                        ? p.webAuthnId
-                        : Buffer.from(p.webAuthnId);
-                    return savedID.equals(incomingID);
-                    });
-        
-                    if (!dbPasskey) {
-                        return null;
-                    }
-        
                     const origin = process.env.AUTHKIT_ORIGN!;
-                    const verification = await verifyCredential(credential, dbPasskey, expectedChallenge, origin, config)
-                    if (!verification) return null;
+                    const response = await verifyCredential(credential, user.passkeys, expectedChallenge, origin, params, user.id);
+                    if (!response) return null;
 
+                    const { verification, passkey: dbPasskey } = response;
                     const { verified, authenticationInfo } = verification;
                     if (verified) {
                         const newCounter = authenticationInfo.newCounter;
                         if (newCounter > dbPasskey.counter) {
                             await adapter.updatePasskey?.(dbPasskey.id, { counter: newCounter });
                         }
-                
+        
                         return user;
                     }
         
@@ -118,6 +101,78 @@ export function PasskeyProvider(): Provider {
                 }
 
                 return null;
+            } catch (error) {
+                console.error("[AUTH-KIT-ERROR]", error)
+                return null;
+            }
+        },
+        register: async (body) => {
+             try {
+                const config = getGlobalConfig();
+                if (!config) return null;
+
+                const { credential } = body;
+                const { rpId } = params;
+        
+                const user = await getSession(config)
+        
+                if (!user) {
+                    return null;
+                }               
+        
+                const expectedChallenge = await getChallenge(params, user.id);
+                if (!expectedChallenge) {
+                    return null;
+                }
+        
+                let verified = false;
+                let registrationInfo: VerifiedRegistrationResponse["registrationInfo"];
+                try {
+                    const opts: VerifyRegistrationResponseOpts = {
+                        response: credential,
+                        expectedChallenge,
+                        expectedOrigin: process.env.AUTHKIT_ORIGN!,
+                        expectedRPID: rpId,
+                        requireUserVerification: false,
+                    };
+        
+                    const verification = await verifyRegistrationResponse(opts);
+                    verified = verification.verified;
+                    registrationInfo = verification.registrationInfo;
+                } catch (error) {
+                    console.error("[AUTH-KIT-ERROR]", error)
+                    return null;
+                } finally {
+                    await deleteChallenge(params, user.id);
+                }
+        
+                if (!verified || !registrationInfo) {
+                    return null;
+                }
+        
+                const { credential: cred } = registrationInfo;
+        
+                let webAuthnID: Uint8Array;
+                try {
+                webAuthnID =
+                    typeof cred.id === "string"
+                    ? decodeBase64Url(cred.id)
+                    : new Uint8Array(cred.id);
+                } catch {
+                    return null;
+                }
+        
+                const publicKey = Buffer.from(cred.publicKey);
+                const transports = cred.transports?.join(",") ?? "";
+        
+                await config.adapter.createPasskey?.(
+                    user.id,
+                    Buffer.from(webAuthnID),
+                    publicKey,
+                    transports
+                );
+        
+                return user;
             } catch (error) {
                 console.error("[AUTH-KIT-ERROR]", error)
                 return null;

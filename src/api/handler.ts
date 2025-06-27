@@ -24,8 +24,6 @@ export function getHandler(params: AuthKitParams) {
                     return routes.loginOptionsRoute(req, params);
                 case 'register/passkey/options':
                     return routes.registerOptionsRoute(req, params);
-                case 'register/passkey/verify':
-                    return routes.registerVerify(req, params);
                 default:
                     return NextResponse.json({ error: 'Endpoint not found', method: "POST", path: cleanPath }, { status: 404 });
                 }

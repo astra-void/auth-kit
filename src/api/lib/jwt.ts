@@ -12,7 +12,15 @@ export async function generateJWT(user: AdapterUser): Promise<NextResponse> {
         secret: process.env.AUTHKIT_SECRET!,
     });
 
-    const res = NextResponse.json({ success: true });
+    const publicUser = {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
+    };
+
+    const res = NextResponse.json({ success: true, user: publicUser });
     res.cookies.set(getCookieName('auth-kit.session-token'), token!, {
         httpOnly: true,
         secure: true,

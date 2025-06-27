@@ -1,16 +1,16 @@
 import { deleteChallengeMap, getChallengeMap, storeChallengeMap } from "../../core/lib/challenge";
-import { AuthKitParams } from "../../core/types";
+import { PasskeyProviderParams } from "../../providers";
 
-export async function storeChallenge(config: AuthKitParams, userId: string, challenge: string): Promise<void> {
-    if (!config.passkey) return;
+export async function storeChallenge(config: PasskeyProviderParams, userId: string, challenge: string): Promise<void> {
+    if (!config) return;
 
-    const { store = 'custom', challengeStore } = config.passkey;
+    const { store = 'custom', challengeStore } = config;
 
     switch (store) {
         case 'memory':
             return await storeChallengeMap(userId, challenge);
         case 'redis':
-            return await config.passkey.challengeStore?.set(userId, challenge);
+            return await challengeStore?.set(userId, challenge);
         case 'custom':
             return await challengeStore?.set(userId, challenge);
         default:
@@ -18,16 +18,16 @@ export async function storeChallenge(config: AuthKitParams, userId: string, chal
     };
 }
 
-export async function getChallenge(config: AuthKitParams, userId: string): Promise<string | null> {
-    if (!config.passkey) return null;
+export async function getChallenge(config: PasskeyProviderParams, userId: string): Promise<string | null> {
+    if (!config) return null;
 
-    const { store = 'custom', challengeStore } = config.passkey;
+    const { store = 'custom', challengeStore } = config;
 
     switch (store) {
         case 'memory':
             return await getChallengeMap(userId) ?? null;
         case 'redis':
-            return await config.passkey.challengeStore?.get(userId) ?? null;
+            return await challengeStore?.get(userId) ?? null;
         case 'custom':
             return await challengeStore?.get(userId) ?? null;;
         default:
@@ -35,16 +35,16 @@ export async function getChallenge(config: AuthKitParams, userId: string): Promi
     }
 }
 
-export async function deleteChallenge(config: AuthKitParams, userId: string): Promise<void> {
-    if (!config.passkey) return;
+export async function deleteChallenge(config: PasskeyProviderParams, userId: string): Promise<void> {
+    if (!config) return;
 
-    const { store = 'custom', challengeStore } = config.passkey;
+    const { store = 'custom', challengeStore } = config;
 
     switch (store) {
         case 'memory':
             return await deleteChallengeMap(userId);
         case 'redis':
-            return await config.passkey.challengeStore?.delete(userId);
+            return await challengeStore?.delete(userId);
         case 'custom':
             return await challengeStore?.delete(userId);
         default:

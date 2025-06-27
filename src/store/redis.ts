@@ -1,4 +1,4 @@
-import { ChallengeStore } from "../core";
+import { ChallengeStore } from "../providers";
 
 const PREFIX = "passkey:challenge";
 

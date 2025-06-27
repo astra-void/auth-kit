@@ -25,6 +25,6 @@ export function getGlobalConfig(): AuthKitParams | undefined {
     if (!config) {
         throw new Error("AuthKit config not found. Did you forget to call setGlobalConfig?");
     }
-    
+
     return config;
 }

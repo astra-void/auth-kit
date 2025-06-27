@@ -2,17 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { AuthKitParams } from "../../../core/types";
 import { generateAuthenticationOptions } from "@simplewebauthn/server";
 import { errorResponse, storeChallenge } from "../../lib";
+import { PasskeyProviderParams } from "../../../providers";
 
 export async function POST(req: NextRequest, config: AuthKitParams) {
     try {
-        if (!config.passkey) {
-            return errorResponse("Passkey config is required", 400);
-        }
-        if (!config.passkey?.rpId || !config.passkey.rpName) {
-            return errorResponse("rpId and rpName is required", 400);
+        const passkeyProvider = config.providers.find(p => p.type === 'passkey');
+        const options = passkeyProvider?.config as PasskeyProviderParams;
+        if (!passkeyProvider || !options) {
+            return errorResponse("Passkey provider is not configured", 400);
         }
 
-        const { mode = 'email' } = config.passkey;
+        const { rpId, mode = 'email' } = options;
         const { adapter } = config;
         
         if (mode === 'email') {
@@ -32,12 +32,12 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
 
             const options = await generateAuthenticationOptions({
                 timeout: 60000,
-                rpID: config.passkey.rpId,
+                rpID: rpId,
                 allowCredentials,
                 userVerification: "preferred",
             });
 
-            await storeChallenge(config, user.id, options.challenge);
+            await storeChallenge(passkeyProvider.config as PasskeyProviderParams, user.id, options.challenge);
 
             return NextResponse.json({ options }, { status: 200 });
         }
@@ -57,14 +57,14 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
 
             const options = await generateAuthenticationOptions({
                 timeout: 60000,
-                rpID: config.passkey.rpId,
+                rpID: rpId,
                 allowCredentials,
                 userVerification: "preferred",
             });
 
             await Promise.all(
                 allowCredentials.map((cred) => 
-                    storeChallenge(config, cred.id, options.challenge)
+                    storeChallenge(passkeyProvider.config as PasskeyProviderParams, cred.id, options.challenge)
                 )
             );
 

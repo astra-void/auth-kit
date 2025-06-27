@@ -1,50 +1,36 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { AuthKitParams } from "../../core/types";
-import { hashPassword } from "../../auth";
-import { signJWT } from "../../jwt";
-import { getCookieName } from "../../core/lib/cookie";
 import { verifyCsrf } from "../../middleware/lib";
-import { errorResponse } from "../lib";
+import { errorResponse, generateJWT } from "../lib";
+import { AdapterUser } from "../../adapters";
 
 export async function POST(req: NextRequest, config: AuthKitParams) {
     try {
-        const { email, password } = await req.json();
-        const { adapter, algorithm = 'argon2' } = config;
+        const body = await req.json();
+        const { provider } = body;
 
         if (!verifyCsrf(req)) {
             return errorResponse("Invalid CSRF token", 403);
         };
 
-        if (!email || !password) {
-            return errorResponse("Invalid request", 400)
+        const selectedProvider = config.providers.find(p => p.name === provider);
+        if (!selectedProvider) {
+            return errorResponse("Unknown provider", 400);
         }
 
-        const hashedPassword = await hashPassword(password, algorithm);
-        if (!hashedPassword) return errorResponse();
-        
-        const user = await adapter.createUser?.(email, hashedPassword);
+        let user: AdapterUser | null = null;
+        try {
+            const result = await selectedProvider.register?.(body);
+            user = result ?? null;
+            if (!user) {
+                return errorResponse("", 401);
+            }
+        } catch { /* empty */ }
         if (!user) {
             return errorResponse("Invalid credentials", 401);
         }
 
-        const token = await signJWT({
-            payload: {
-                sub: user.id,
-                email: user.email
-            },
-            secret: process.env.AUTHKIT_SECRET!,
-        });
-
-        const res = NextResponse.json({ success: true });
-        res.cookies.set(getCookieName('auth-kit.session-token'), token!, {
-            httpOnly: true,
-            secure: true,
-            path: '/',
-            sameSite: 'lax',
-            maxAge: 60 * 60,
-        });
-
-        return res;
+        return await generateJWT(user);
     } catch (error) {
         console.error("[AUTH-KIT-ERROR]", error)
         return errorResponse();

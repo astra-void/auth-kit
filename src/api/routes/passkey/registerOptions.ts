@@ -4,18 +4,24 @@ import { generateRegistrationOptions } from "@simplewebauthn/server";
 import { getSession } from "../../../auth/lib/session";
 import { errorResponse, storeChallenge } from "../../lib";
 import { verifyCsrf } from "../../../middleware/lib";
+import { PasskeyProviderParams } from "../../../providers";
 
 export async function POST(req: NextRequest, config: AuthKitParams) {
     try {
-        if (!config.passkey) {
-            return errorResponse("Passkey config is required", 400);
+        const passkeyProvider = config.providers.find(p => p.type === 'passkey');
+        const options = passkeyProvider?.config as PasskeyProviderParams;
+        if (!passkeyProvider || !options) {
+            return errorResponse("Passkey provider is not configured", 400);
         }
-        if (!config.passkey?.rpId || !config.passkey.rpName) {
+
+        if (!options.rpId || !options.rpName) {
             return errorResponse("rpId and rpName is required", 400);
         }
         if (!verifyCsrf(req)) {
             return errorResponse("Invalid CSRF token", 403);
         };
+
+        const { rpId, rpName } = options;
 
         const user = await getSession(config)
 
@@ -23,9 +29,9 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
             return errorResponse("Authentication required", 401);
         }
 
-        const options = await generateRegistrationOptions({
-            rpName: config.passkey.rpName,
-            rpID: config.passkey.rpId,
+        const registrationOptions = await generateRegistrationOptions({
+            rpName: rpName,
+            rpID: rpId,
             userID: new TextEncoder().encode(user.id),
             userName: user.username ?? user.email ?? "unknown-user",
             userDisplayName: user.username ?? user.email ?? "unknown-user",
@@ -38,9 +44,9 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
             supportedAlgorithmIDs: [-7, -257],
         });
 
-        await storeChallenge(config, user.id, options.challenge);
+        await storeChallenge(passkeyProvider.config as PasskeyProviderParams, user.id, registrationOptions.challenge);
 
-        return NextResponse.json({ options }, { status: 200 });
+        return NextResponse.json({ options: registrationOptions }, { status: 200 });
     } catch (error) {
         console.error("[AUTH-KIT-ERROR]", error);
         return errorResponse();

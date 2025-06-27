@@ -1,6 +1,6 @@
 {
   "name": "@astra-void/auth-kit",
-  "version": "0.5.0-alpha.4",
+  "version": "0.5.0",
   "description": "Next.js authentication with passkey support",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -32,11 +32,6 @@
       "types": "./dist/react/index.d.ts",
       "import": "./dist/react/index.js",
       "require": "./dist/react/index.cjs"
-    },
-    "./react/passkey": {
-      "types": "./dist/react/passkey/index.d.ts",
-      "import": "./dist/react/passkey/index.js",
-      "require": "./dist/react/passkey/index.cjs"
     },
     "./providers": {
       "types": "./dist/providers/index.d.ts",
