@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { getSession } from "./getSession";
+import { getSession } from "../getSession";
 import { startRegistration } from "@simplewebauthn/browser";
 import { authRequest } from "../utils";
 

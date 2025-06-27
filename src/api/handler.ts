@@ -22,8 +22,6 @@ export function getHandler(params: AuthKitParams) {
                     return routes.registerRoute(req, params);
                 case 'login/passkey/options':
                     return routes.loginOptionsRoute(req, params);
-                case 'login/passkey/verify':
-                    return routes.loginVerifyRoute(req, params);
                 case 'register/passkey/options':
                     return routes.registerOptionsRoute(req, params);
                 case 'register/passkey/verify':

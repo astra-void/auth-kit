@@ -3,9 +3,12 @@ import { AdapterUser } from "../adapters";
 
 export type AuthorizeTypes = "oauth" | "email" | "credentials" | "passkey";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Body = Record<string, any>;
+
 export interface Provider {
     name: string;
     type: AuthorizeTypes;
-    authorize: (req: NextRequest) => Promise<AdapterUser | null>;
+    authorize: (body: Body) => Promise<AdapterUser | null>;
     callback?: (req: NextRequest) => Promise<AdapterUser | null>;
 }

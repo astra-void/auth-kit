@@ -1,6 +1,6 @@
 import axios from "axios";
-import { AdapterUser } from "../../adapters";
-import { User } from "../hooks";
+import { AdapterUser } from "../adapters";
+import { User } from "./hooks";
 
 export async function getSession(): Promise<User | AdapterUser | null> {
   try {

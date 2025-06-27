@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { AuthKitParams } from "../../../core/types";
 import { generateAuthenticationOptions } from "@simplewebauthn/server";
 import { errorResponse, storeChallenge } from "../../lib";
-import { verifyCsrf } from "../../../middleware/lib";
 
 export async function POST(req: NextRequest, config: AuthKitParams) {
     try {
@@ -12,9 +11,6 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
         if (!config.passkey?.rpId || !config.passkey.rpName) {
             return errorResponse("rpId and rpName is required", 400);
         }
-        if (!verifyCsrf(req)) {
-            return errorResponse("Invalid CSRF token", 403);
-        };
 
         const { mode = 'email' } = config.passkey;
         const { adapter } = config;

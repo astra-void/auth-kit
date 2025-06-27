@@ -1,14 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { AuthKitParams } from "../../core/types";
-import { signJWT } from "../../jwt";
-import { getCookieName } from "../../core/lib/cookie";
 import { verifyCsrf } from "../../middleware/lib";
-import { errorResponse } from "../lib";
+import { errorResponse, generateJWT } from "../lib";
 import { AdapterUser } from "../../adapters";
 
 export async function POST(req: NextRequest, config: AuthKitParams) {  
     try {
-        const { provider } = await req.json();
+        const body = await req.json();
+        const { provider } = body;
 
         if (!verifyCsrf(req)) {
             return errorResponse("Invalid CSRF token", 403);
@@ -21,29 +20,13 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
 
         let user: AdapterUser | null = null;
         try {
-            user = await selectedProvider.authorize(req);
+            user = await selectedProvider.authorize(body);
         } catch { /* empty */ }
         if (!user) {
             return errorResponse("Invalid credentials", 401);
         }
 
-        const token = await signJWT({
-            payload: {
-                sub: user.id,
-                email: user.email
-            },
-            secret: process.env.AUTHKIT_SECRET!,
-        });
-        const res = NextResponse.json({ ok: true });
-        res.cookies.set(getCookieName('auth-kit.session-token'), token!, {
-            httpOnly: true,
-            secure: true,
-            path: '/',
-            sameSite: 'lax',
-            maxAge: 60 * 60,
-        });
-
-        return res;
+        return await generateJWT(user);
     } catch (error) {
         console.error("[AUTH-KIT-ERROR]", error);
         return errorResponse();
