@@ -3,9 +3,14 @@ import { AuthKitParams } from "../../../core/types";
 import { generateAuthenticationOptions } from "@simplewebauthn/server";
 import { errorResponse, storeChallenge } from "../../lib";
 import { PasskeyProviderParams } from "../../../providers";
+import { verifyCsrf } from "../../../middleware/lib";
 
 export async function POST(req: NextRequest, config: AuthKitParams) {
     try {
+        if (!verifyCsrf(req)) {
+            return errorResponse("Invalid CSRF token", 403);
+        };
+
         const passkeyProvider = config.providers.find(p => p.type === 'passkey');
         const options = passkeyProvider?.config as PasskeyProviderParams;
         if (!passkeyProvider || !options) {
