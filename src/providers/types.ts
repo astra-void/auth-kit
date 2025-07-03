@@ -2,7 +2,7 @@
 import { NextRequest } from "next/server";
 import { AdapterUser } from "../adapters";
 
-export type AuthorizeTypes = "oauth" | "email" | "credentials" | "passkey";
+export type AuthorizeTypes = "oauth" | "email" | "magiclink" | "credentials" | "passkey";
 
 export type Body = Record<string, any>;
 
