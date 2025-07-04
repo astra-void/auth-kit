@@ -40,7 +40,7 @@ export function PasskeyProvider(params: PasskeyProviderParams): Provider {
                         return null;
                     }
 
-                    const origin = process.env.AUTHKIT_ORIGN!;
+                    const origin = process.env.AUTHKIT_ORIGIN!;
                     const response = await verifyCredential(credential, passkey, expectedChallenge, origin, params, user.id);
                     if (!response) return null;
 
@@ -82,7 +82,7 @@ export function PasskeyProvider(params: PasskeyProviderParams): Provider {
                         return null;
                     }
         
-                    const origin = process.env.AUTHKIT_ORIGN!;
+                    const origin = process.env.AUTHKIT_ORIGIN!;
                     const response = await verifyCredential(credential, user.passkeys, expectedChallenge, origin, params, user.id);
                     if (!response) return null;
 
@@ -131,7 +131,7 @@ export function PasskeyProvider(params: PasskeyProviderParams): Provider {
                     const opts: VerifyRegistrationResponseOpts = {
                         response: credential,
                         expectedChallenge,
-                        expectedOrigin: process.env.AUTHKIT_ORIGN!,
+                        expectedOrigin: process.env.AUTHKIT_ORIGIN!,
                         expectedRPID: rpId,
                         requireUserVerification: false,
                     };
