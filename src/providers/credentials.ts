@@ -16,8 +16,7 @@ export function CredentialsProvider(
         const user = await config.adapter.getUserByEmail?.(email);
         if (!user || !user.hashedPassword) return null;
 
-        const algorithm = config.algorithm ?? "argon2";
-        const isValid = await verifyPassword(password, user.hashedPassword, algorithm);
+        const isValid = await verifyPassword(password, user.hashedPassword, config.algorithm ?? 'argon2');
 
         return isValid ? user : null;
     };

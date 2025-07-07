@@ -1,6 +1,6 @@
 {
   "name": "@astra-void/auth-kit",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "Next.js authentication with passkey support",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

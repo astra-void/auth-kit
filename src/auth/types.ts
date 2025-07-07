@@ -1,1 +1,1 @@
-export type HashingAlgorithm = 'bcrypt' | 'argon2';
+export type HashingAlgorithm = 'argon2' | 'scrypt';
