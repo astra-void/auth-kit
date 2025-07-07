@@ -68,19 +68,33 @@ export function PrismaAdapter(prisma: any): Adapter {
     },
 
     getUser: async (id) => {
-      const user = await prisma.user.findUnique({
-        where: { id },
-        include: { passkeys: true },
-      });
-      return user ? mapUser(user) : null;
+      try {
+        const user = await prisma.user.findUnique({
+          where: { id },
+          include: { passkeys: true },
+        });
+        return user ? mapUser(user) : null;
+      } catch {
+        const user = await prisma.user.findUnique({
+          where: { id }
+        });
+        return user ? mapUser(user) : null;
+      }
     },
 
     getUserByEmail: async (email) => {
-      const user = await prisma.user.findUnique({
-        where: { email },
-        include: { passkeys: true },
-      });
-      return user ? mapUser(user) : null;
+      try {
+        const user = await prisma.user.findUnique({
+          where: { email },
+          include: { passkeys: true },
+        });
+        return user ? mapUser(user) : null;
+      } catch {
+        const user = await prisma.user.findUnique({
+          where: { email }
+        });
+        return user ? mapUser(user) : null;
+      }
     },
 
     updateUser: async (userId, data) => {

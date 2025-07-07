@@ -22,10 +22,8 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
         try {
             const result = await selectedProvider.register?.(body);
             user = result ?? null;
-            if (!user) {
-                return errorResponse("", 401);
-            }
         } catch { /* empty */ }
+        
         if (!user) {
             return errorResponse("Invalid credentials", 401);
         }
