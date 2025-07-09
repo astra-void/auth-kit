@@ -11,12 +11,17 @@ export function CredentialsProvider(
         if (!config) throw new Error("Config not found");
 
         const { email, password } = body;
+        const { adapter } = config;
         if (!email || !password) return null;
 
-        const user = await config.adapter.getUserByEmail?.(email);
+        const user = await adapter.getUserByEmail?.(email);
         if (!user || !user.hashedPassword) return null;
 
         const isValid = await verifyPassword(password, user.hashedPassword, config.algorithm ?? 'argon2');
+
+        if (adapter.isTotpEnabled?.(user.id)) {
+            user.awaitingTotp = true;
+        }
 
         return isValid ? user : null;
     };

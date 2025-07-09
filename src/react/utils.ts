@@ -28,7 +28,7 @@ export async function authRequest<T>(
       throw new Error("CSRF token not found.");
     }
 
-    const res = await axios.request({
+    const res = await axios.request<T>({
       url,
       method,
       data,

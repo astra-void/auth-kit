@@ -9,7 +9,7 @@ import { startAuthentication } from "@simplewebauthn/browser";
 export async function login(
   provider: string, 
   params?: LoginParams
-): Promise<User | AdapterUser | null> {
+): Promise<User | AdapterUser | any |null> {
   try {
     const redirect = params?.redirect ?? true;
     const redirectUrl = params?.redirectUrl ?? '/';
@@ -18,6 +18,7 @@ export async function login(
 
     if (params?.email) body.email = params.email;
     if (params?.password) body.password = params.password;
+    if (params?.otpCode) body.otpCode = params.otpCode;
 
     if (provider === 'passkey') {
         try {
@@ -57,7 +58,7 @@ export async function login(
 
             if (verification === true) {
                 if (redirect) {
-                    window.location.href = redirectUrl
+                  window.location.href = redirectUrl
                 }
                 return null;
             } else {
@@ -68,14 +69,21 @@ export async function login(
         }
     }
 
-    const req = await authRequest<User | AdapterUser | null>(
+    const req = await authRequest<AdapterUser | any | null>(
       "POST",
       "/api/auth/login",
       body
     );
+    if (!req) return null;
 
-    if (!req?.data || req.status !== 200) {
+    const { status } = req;
+    const data = req.data.data;
+    if (!data || status !== 200) {
       return null;
+    }
+
+    if (data.requiresTotp && !params?.otpCode) {
+      return { requiresTotp: true };
     }
 
     if (redirect) {
@@ -83,7 +91,7 @@ export async function login(
       return null;
     }
 
-    return req.data;
+    return data;
   } catch {
     return null;
   }

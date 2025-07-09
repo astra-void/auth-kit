@@ -3,6 +3,7 @@ export interface LoginParams {
     password?: string;
     redirect?: boolean;
     redirectUrl?: string;
+    otpCode?: string;
 }
 
 export interface LogoutParams {

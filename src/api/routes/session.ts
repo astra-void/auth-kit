@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { AuthKitParams } from "../../core/types";
 import { verifyJWT } from "../../jwt";
 import { getCookieName } from "../../core/lib/cookie";
-import { errorResponse } from "../lib";
+import { errorResponse, successResponse } from "../lib";
 
 export async function GET(req: NextRequest, config: AuthKitParams) {
     try {
@@ -11,20 +11,20 @@ export async function GET(req: NextRequest, config: AuthKitParams) {
         const secret = process.env.AUTHKIT_SECRET;
 
         if (!token || !secret) {
-            return NextResponse.json({ user: null }, { status: 200 });
+            return successResponse({ data: { user: null }, status: 200 });
         }
 
         const payload = await verifyJWT({ token, secret });
         if (!payload?.sub || !payload?.email || typeof payload?.email !== 'string') {
-            return NextResponse.json({ user: null }, { status: 200 });
+            return successResponse({ data: { user: null }, status: 200 });
         }
 
         const user = await adapter.getUserByEmail?.(payload.email);
         if (!user) {
-            return NextResponse.json({ user: null }, { status: 200 });
+            return successResponse({ data: { user: null }, status: 200 });
         }
 
-        return NextResponse.json({ user: { id: user.id, email: user.email } }, { status: 200 });
+        return successResponse({ data: { user: { id: user.id, email: user.email } }, status: 200 })
     } catch (error) {
         console.error("[AUTH-KIT-ERROR]", error);
         return errorResponse();

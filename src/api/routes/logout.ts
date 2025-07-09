@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { verifyCsrf } from "../../middleware/lib";
 import { getCookieName } from "../../core/lib/cookie";
-import { errorResponse } from "../lib";
+import { errorResponse, successResponse } from "../lib";
 
 export async function POST(req: NextRequest) {
     try {
@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
             return errorResponse("Already logged out", 401);
         }
 
-        const res = NextResponse.json({ message: "Logged out", success: true }, { status: 200 });
+        const res = successResponse({ message: "Logged out", status: 200 });
         res.cookies.delete(getCookieName('auth-kit.session-token'))
 
         return res;

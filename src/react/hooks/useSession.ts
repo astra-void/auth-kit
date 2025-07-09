@@ -12,8 +12,8 @@ export function useSession(): UseSessionResult {
 
         const getSession = async () => {
             try {
-                const data = (await axios.get('/api/auth/session')).data
-
+                const data = (await axios.get('/api/auth/session')).data.data;
+                
                 if (isMounted) {
                     if (data.user) {
                         setUser(data.user);

@@ -178,5 +178,27 @@ export function PrismaAdapter(prisma: any): Adapter {
       });
       return null;
     },
+
+    enableTotp: async (userId) => {
+      await prisma.user.update({
+        where: { id: userId },
+        data: { totpEnabled: true },
+      });
+    },
+
+    disableTotp: async (userId) => {
+      await prisma.user.update({
+        where: { id: userId },
+        data: { totpEnabled: false },
+      });
+    },
+
+    isTotpEnabled: async (userId) => {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { totpEnabled: true },
+      });
+      return user?.totpEnabled ?? false;
+    },
   };
 }

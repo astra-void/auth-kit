@@ -1,7 +1,8 @@
 import { User } from "../react/hooks/types";
 
 export interface AdapterUser extends User {
-    passkeys?: Passkey[]
+    passkeys?: Passkey[];
+    awaitingTotp?: boolean;
 }
 
 export interface Passkey {
@@ -28,4 +29,7 @@ export interface Adapter {
     getPasskeys?: () => Promise<Passkey[] | null>;
     updatePasskey?: (passkeyId: string, data: Partial<Passkey>) => Promise<Passkey>;
     deletePasskey?: (userId: string) => Promise<null>;
+    enableTotp?: (userId: string) => Promise<void>;
+    disableTotp?: (userId: string) => Promise<void>;
+    isTotpEnabled?: (userId: string) => Promise<boolean>;
 }
