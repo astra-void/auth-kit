@@ -47,11 +47,7 @@ export async function register(
             }
         }
 
-        const req = await authRequest<User | AdapterUser | null>(
-            "POST",
-            "/api/auth/register",
-            body,
-        );
+        const req = await authRequest<User | AdapterUser | null>("POST", "/api/auth/register", body);
 
         if (!req?.data || req.status !== 200) {
             return null;

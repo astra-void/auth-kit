@@ -5,10 +5,7 @@ export async function logout(params: LogoutParams = {}) {
     try {
         const { redirect = true, redirectUrl = '/' } = params;
 
-        const req = await authRequest(
-            "POST",
-            "/api/auth/logout",
-        );
+        const req = await authRequest("POST", "/api/auth/logout");
 
         if (redirect) {
             window.location.href = redirectUrl;
