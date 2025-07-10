@@ -1,6 +1,6 @@
 {
   "name": "@astra-void/auth-kit",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Next.js authentication with passkey support",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -52,7 +52,6 @@
     "passkey",
     "authentication",
     "login",
-    "register",
     "webauthn",
     "auth",
     "prisma",

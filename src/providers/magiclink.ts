@@ -1,6 +1,6 @@
+import { generateRandomToken } from "../auth/lib/token";
 import { getGlobalConfig } from "../core";
 import { sendEmail } from "../core/lib";
-import { signJWT } from "../jwt";
 import { Provider } from "./types";
 
 export function MagiclinkProvider(
@@ -20,16 +20,9 @@ export function MagiclinkProvider(
             const user = await adapter.getUserByEmail?.(email);
             if (!user) return null;
 
-            const token = await signJWT({
-                payload: {
-                    sub: user.id,
-                    email: user.email
-                },
-                secret: process.env.AUTHKIT_SECRET!,
-                options: {
-                    maxAge: 15 * 60,
-                }
-            });
+            const token = generateRandomToken();
+
+            await adapter.createMagicLinkToken?.(email, token, new Date(Date.now() + 1000 * 60 * 15));
 
             const callbackUrl = `${process.env.AUTHKIT_ORIGIN}/api/auth/callback?token=${token}`;
 

@@ -200,5 +200,48 @@ export function PrismaAdapter(prisma: any): Adapter {
       });
       return user?.totpEnabled ?? false;
     },
+
+    createMagicLinkToken: async (email, token, expires) => {
+      await prisma.magicLinkToken.create({
+        data: {
+          email,
+          token,
+          expiresAt: expires,
+        },
+      });
+    },
+
+    getUserByMagicLinkToken: async (token) => {
+      const magicLink = await prisma.magicLinkToken.findUnique({
+        where: { token },
+      });
+
+      if (!magicLink || magicLink.expiresAt < new Date()) {
+        if (magicLink) {
+          await prisma.magicLinkToken.delete({ where: { token } });
+        }
+        return null;
+      }
+
+      const user = await prisma.user.findUnique({
+        where: { email: magicLink.email },
+      });
+
+      return user ? mapUser(user) : null;
+    },
+
+    deleteMagicLinkToken: async (token?: string) => {
+      if (token) {
+        await prisma.magicLinkToken.delete({ where: { token } });
+      } else {
+        await prisma.magicLinkToken.deleteMany({
+          where: {
+            expiresAt: {
+              lt: new Date(),
+            },
+          },
+        });
+      }
+    }
   };
 }

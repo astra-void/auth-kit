@@ -28,9 +28,6 @@ export async function login(
                 throw Error("Already logged in")
             }
 
-            const redirect = params?.redirect ?? true;
-            const redirectUrl = params?.redirectUrl ?? '/';
-
             if (params?.email) {
                 const { email } = params;
 
@@ -86,12 +83,14 @@ export async function login(
       return { requiresTotp: true };
     }
 
-    if (redirect) {
-      window.location.href = redirectUrl;
-      return null;
-    }
+    if (data.success === true || !data.requiresTotp) {
+      if (redirect) {
+        window.location.href = redirectUrl
+        return null;
+      }
 
-    return data;
+      return data;
+    }
   } catch {
     return null;
   }

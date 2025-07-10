@@ -19,7 +19,7 @@ export function CredentialsProvider(
 
         const isValid = await verifyPassword(password, user.hashedPassword, config.algorithm ?? 'argon2');
 
-        if (adapter.isTotpEnabled?.(user.id)) {
+        if (await adapter.isTotpEnabled?.(user.id)) {
             user.awaitingTotp = true;
         }
 

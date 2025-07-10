@@ -32,4 +32,7 @@ export interface Adapter {
     enableTotp?: (userId: string) => Promise<void>;
     disableTotp?: (userId: string) => Promise<void>;
     isTotpEnabled?: (userId: string) => Promise<boolean>;
+    createMagicLinkToken?: (email: string, token: string, expires: Date) => Promise<void>;
+    getUserByMagicLinkToken?: (token: string) => Promise<AdapterUser | null>;
+    deleteMagicLinkToken: (token?: string) => Promise<void>;
 }
