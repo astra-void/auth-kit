@@ -1,11 +1,12 @@
 {
   "name": "@astra-void/auth-kit",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Next.js authentication with passkey support",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
-    "dist/"
+    "dist",
+    "README.md"
   ],
   "exports": {
     ".": {
@@ -40,7 +41,7 @@
     }
   },
   "scripts": {
-    "build": "tsup src --format esm,cjs --dts --outDir dist --clean",
+    "build": "tsup src --minify --format esm,cjs --outDir dist --clean && tsc --emitDeclarationOnly --declaration --outDir dist",
     "dev": "tsup src/index.ts --watch --format esm,cjs --dts --outDir dist",
     "lint": "eslint",
     "test": "jest --config ./jest.config.js"
