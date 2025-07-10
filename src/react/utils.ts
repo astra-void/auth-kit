@@ -1,5 +1,3 @@
-import axios from "axios";
-
 export function getCsrfTokenFromCookie(): string | null {
     if (typeof document === 'undefined') return null;
 
@@ -28,17 +26,28 @@ export async function authRequest<T>(
       throw new Error("CSRF token not found.");
     }
 
-    const res = await axios.request<T>({
-      url,
+    const headers: Record<string, string> = {
+      "X-CSRF-Token": csrfToken,
+    };
+
+    let body: string | undefined = undefined;
+    if (data) {
+      body = JSON.stringify(data);
+      headers["Content-Type"] = "application/json";
+    }
+
+    const res = await fetch(url, {
       method,
-      data,
-      headers: {
-        "X-CSRF-Token": csrfToken,
-      },
-      withCredentials: true,
+      headers,
+      body,
+      credentials: "include",
     });
 
-    return { data: res.data, status: res.status };
+    if (!res.ok) return null;
+
+    const responseData = (await res.json()) as T;
+
+    return { data: responseData, status: res.status };
   } catch {
     return null;
   }

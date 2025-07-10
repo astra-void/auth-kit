@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { AdapterUser } from "../../adapters";
 import { SessionStatus, User, UseSessionResult } from "./types";
-import axios from "axios";
+import { getSession } from "../getSession";
 
 export function useSession(): UseSessionResult {
     const [user, setUser] = useState<User | AdapterUser | null>(null);
@@ -10,13 +10,13 @@ export function useSession(): UseSessionResult {
     useEffect(() => {
         let isMounted = true;
 
-        const getSession = async () => {
+        const getSessionFunction = async () => {
             try {
-                const data = (await axios.get('/api/auth/session')).data.data;
+                const user = await getSession();
                 
                 if (isMounted) {
-                    if (data.user) {
-                        setUser(data.user);
+                    if (user) {
+                        setUser(user);
                         setStatus("authenticated");
                     } else {
                         setUser(null);
@@ -31,7 +31,7 @@ export function useSession(): UseSessionResult {
             }
         };
 
-        getSession();
+        getSessionFunction();
 
         return () => {
             isMounted = false;

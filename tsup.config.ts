@@ -7,6 +7,7 @@ export default defineConfig({
     dts: false,
     minify: true,
     clean: true,
+    splitting: false,
     external: [
         '@simplewebauthn/browser',
         '@simplewebauthn/server',
