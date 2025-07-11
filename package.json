@@ -1,6 +1,6 @@
 {
   "name": "@astra-void/auth-kit",
-  "version": "0.6.4",
+  "version": "0.6.5",
   "description": "Next.js authentication with passkey support",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -11,37 +11,31 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": "./dist/index.mjs"
     },
     "./adapters": {
       "types": "./dist/adapters/index.d.ts",
-      "import": "./dist/adapters/index.js",
-      "require": "./dist/adapters/index.cjs"
+      "import": "./dist/adapters/index.mjs"
     },
     "./middleware": {
       "types": "./dist/middleware/index.d.ts",
-      "import": "./dist/middleware/index.js",
-      "require": "./dist/middleware/index.cjs"
+      "import": "./dist/middleware/index.mjs"
     },
     "./store": {
       "types": "./dist/store/index.d.ts",
-      "import": "./dist/store/index.js",
-      "require": "./dist/store/index.cjs"
+      "import": "./dist/store/index.mjs"
     },
     "./react": {
       "types": "./dist/react/index.d.ts",
-      "import": "./dist/react/index.js",
-      "require": "./dist/react/index.cjs"
+      "import": "./dist/react/index.mjs"
     },
     "./providers": {
       "types": "./dist/providers/index.d.ts",
-      "import": "./dist/providers/index.js",
-      "require": "./dist/providers/index.cjs"
+      "import": "./dist/providers/index.mjs"
     }
   },
   "scripts": {
-    "build": "tsup && tsc --emitDeclarationOnly --declaration --outDir dist",
+    "build": "tsup && tsc --emitDeclarationOnly --declaration --outDir dist && pnpm pack",
     "dev": "tsup src/index.ts --watch --format esm,cjs --dts --outDir dist",
     "lint": "eslint",
     "test": "jest --config ./jest.config.js"

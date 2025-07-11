@@ -1,2 +1,2 @@
-export * from "./useSession";
-export * from "./types";
+export { useSession } from "./useSession";
+export { User, UseSessionResult, SessionStatus } from "./types";

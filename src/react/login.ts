@@ -31,9 +31,9 @@ export async function login(
             if (params?.email) {
                 const { email } = params;
 
-                const options = (await authRequest<any>('POST', "/api/auth/login/passkey/options", { email }))?.data.options;
+                const options = (await authRequest<any>('POST', "/api/auth/login/passkey/options", { email }))?.data.authOptions;
                 const credential = await startAuthentication({ optionsJSON: options });
-                body.credential= credential;
+                body.credential = credential;
 
                 const verification = (await authRequest<any>('POST', '/api/auth/login', body))?.data.success;
                 
@@ -47,7 +47,7 @@ export async function login(
                 }
             }
 
-            const options = (await authRequest<any>('POST', "/api/auth/login/passkey/options"))?.data.options;
+            const options = (await authRequest<any>('POST', "/api/auth/login/passkey/options"))?.data.authOptions;
             const credential = await startAuthentication({ optionsJSON: options });
             body.credential= credential;
 
@@ -74,16 +74,16 @@ export async function login(
     if (!req) return null;
 
     const { status } = req;
-    const data = req.data.data;
+    const data = req.data
     if (!data || status !== 200) {
       return null;
     }
 
-    if (data.requiresTotp && !params?.otpCode) {
+    if (data.data.requiresTotp && !params?.otpCode) {
       return { requiresTotp: true };
     }
 
-    if (data.success === true || !data.requiresTotp) {
+    if (data.success === true || !data.data.requiresTotp) {
       if (redirect) {
         window.location.href = redirectUrl
         return null;

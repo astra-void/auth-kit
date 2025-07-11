@@ -1,2 +1,2 @@
-export * from "./session";
-export * from "./totp";
+export { getSession } from "./session";
+export { deriveTotpSecret, generateTOTP, generateOtpAuthUrl, verifyTOTP } from "./totp";

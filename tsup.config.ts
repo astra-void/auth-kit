@@ -8,6 +8,8 @@ export default defineConfig({
     minify: true,
     clean: true,
     splitting: false,
+    treeshake: true,
+    // metafile: true,
     external: [
         '@simplewebauthn/browser',
         '@simplewebauthn/server',

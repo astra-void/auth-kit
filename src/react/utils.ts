@@ -18,7 +18,7 @@ export function getCsrfTokenFromCookie(): string | null {
 export async function authRequest<T>(
   method: "POST" | "GET" | "PUT" | "DELETE",
   url: string,
-  data?: object
+  body?: object
 ): Promise<{ data: T, status: number } | null> {
   try {
     const csrfToken = getCsrfTokenFromCookie();
@@ -30,24 +30,24 @@ export async function authRequest<T>(
       "X-CSRF-Token": csrfToken,
     };
 
-    let body: string | undefined = undefined;
-    if (data) {
-      body = JSON.stringify(data);
+    let reqBody: string | undefined = undefined;
+    if (body) {
+      reqBody = JSON.stringify(body);
       headers["Content-Type"] = "application/json";
     }
 
     const res = await fetch(url, {
       method,
       headers,
-      body,
+      body: reqBody,
       credentials: "include",
     });
 
     if (!res.ok) return null;
 
-    const responseData = (await res.json()) as T;
+    const data = (await res.json()) as T;
 
-    return { data: responseData, status: res.status };
+    return { data, status: res.status };
   } catch {
     return null;
   }

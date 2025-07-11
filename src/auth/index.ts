@@ -1,3 +1,3 @@
-export * from "./hash";
-export * from "./types";
-export * from "./lib";
+export { hashPassword, verifyPassword } from "./hash";
+export { HashingAlgorithm } from "./types";
+export { getSession, deriveTotpSecret, generateTOTP, generateOtpAuthUrl, verifyTOTP } from "./lib";

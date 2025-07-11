@@ -1,3 +1,3 @@
 export { AuthKit } from "./init";
-export * from "./config"
-export * from "./types";
+export { setGlobalConfig, getGlobalConfig } from "./config"
+export { AuthKitParams } from "./types";

@@ -1,2 +1,2 @@
 export { PrismaAdapter } from "./prisma";
-export * from "./types";    
+export { Adapter, AdapterUser, Passkey } from "./types";    
