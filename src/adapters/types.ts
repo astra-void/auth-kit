@@ -1,6 +1,7 @@
 import { User } from "../react/hooks/types";
 
 export interface AdapterUser extends User {
+    role?: string;
     passkeys?: Passkey[];
     awaitingTotp?: boolean;
 }
