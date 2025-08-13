@@ -24,7 +24,6 @@ export interface ChallengeStore {
 export interface PasskeyProviderParams {
     rpId: string;
     rpName: string;
-    store?: 'memory' | 'redis' | 'custom';
     mode?: 'email' | 'credential'
     challengeStore?: ChallengeStore;    
 }

@@ -35,7 +35,7 @@ export function PasskeyProvider(params: PasskeyProviderParams): Provider {
                     }
         
                     const expectedChallenge = await getChallenge(params, user.id)
-        
+
                     if (!expectedChallenge) {
                         return null;
                     }
