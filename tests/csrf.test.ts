@@ -19,15 +19,15 @@ describe("CSRF Token", () => {
         process.env.AUTHKIT_SECRET = "test-secret";
     })
 
-    test("valid token should pass verification", () => {
-        const token = generateCsrfToken();
+    test("valid token should pass verification", async () => {
+        const token = await generateCsrfToken();
         const req = mockRequestWithToken(token);
         const result = verifyCsrf(req);
         expect(result).toBe(true);
     })
 
-    test("token with modified HMAC should fail", () => {
-        const token = generateCsrfToken();
+    test("token with modified HMAC should fail", async () => {
+        const token = await generateCsrfToken();
         const tampered = token.replace(/.$/, c => c === 'a' ? 'b' : 'a');
         const req = mockRequestWithToken(tampered);
         const result = verifyCsrf(req);
