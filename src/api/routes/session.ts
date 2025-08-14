@@ -24,7 +24,7 @@ export async function GET(req: NextRequest, config: AuthKitParams) {
             return successResponse({ data: { user: null }, status: 200 });
         }
 
-        return successResponse({ data: { user: { id: user.id, email: user.email, ...(user.role && { role: user.role }), } }, status: 200 })
+        return successResponse({ data: { user: { id: user.id, email: user.email, role: user.role } }, status: 200 })
     } catch (error) {
         console.error("[AUTH-KIT-ERROR]", error);
         return errorResponse();

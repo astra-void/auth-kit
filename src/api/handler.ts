@@ -31,6 +31,8 @@ export function getHandler(params: AuthKitParams) {
             switch (cleanPath) {
                 case 'callback':
                     return routes.callbackRoute(req);
+                case 'error':
+                    return routes.errorRoute();
                 case 'session':
                     return routes.sessionRoute(req, params);
                 default:

@@ -7,7 +7,8 @@ export async function generateJWT(user: AdapterUser, redirect?: boolean): Promis
     const token = await signJWT({
         payload: {
             sub: user.id,
-            email: user.email
+            email: user.email,
+            role: user.role ?? null
         },
         secret: process.env.AUTHKIT_SECRET!,
     });
@@ -16,6 +17,7 @@ export async function generateJWT(user: AdapterUser, redirect?: boolean): Promis
         id: user.id,
         email: user.email,
         username: user.username,
+        role: user.role ?? null,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt
     };

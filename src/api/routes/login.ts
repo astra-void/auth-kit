@@ -20,11 +20,16 @@ export async function POST(req: NextRequest, config: AuthKitParams) {
         }
 
         let user: AdapterUser | null = null;
+        const { authorize, type } = selectedProvider;
         try {
-            user = await selectedProvider.authorize(body);
+            user = await authorize(body);
         } catch { /* empty */ }
         if (!user) {
             return errorResponse("Invalid credentials", 401);
+        }
+
+        if (type === 'oauth' || type === 'magiclink') {
+            return successResponse({ status: 202 });
         }
 
         if (user.awaitingTotp && !body.otpCode) {
