@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MiddlewareParams } from "./types";
-import { getCookieName } from "./lib/cookie";
 import { CSRF_COOKIE_NAME, generateCsrfToken } from "./lib";
+import { getCookieName } from "../core/lib";
+import { verifyJWT } from "../jwt";
 
 export function AuthKitMiddleware(config: MiddlewareParams) {
-    return function middleware(req: NextRequest) {
+    return async function middleware(req: NextRequest) {
         const { pathname } = req.nextUrl;
         const {
             alwaysSetToken = false,
@@ -14,17 +15,30 @@ export function AuthKitMiddleware(config: MiddlewareParams) {
             protectedRoutes = [],
         } = config;
 
+        const isProtected = protectedRoutes.some(route => pathname.startsWith(route));
+        if (isProtected) {
+            const sessionToken = req.cookies.get(getCookieName("auth-kit.session-token"))?.value;
+            if (!sessionToken) {
+                return NextResponse.redirect(req.nextUrl.origin + loginPath);
+            }
+            
+            const session = verifyJWT({ token: sessionToken, secret: process.env.AUTH_KIT_SECRET! });
+            if (!session) {
+                return NextResponse.redirect(req.nextUrl.origin + loginPath);
+            }
+        }
+
         const needCsrfToken = alwaysSetToken ||
             pathname === loginPath || 
             pathname === logoutPath ||
             pathname === registerPath ||
-            protectedRoutes.some(route => pathname.startsWith(route));
+            isProtected;
 
         if (!needCsrfToken) return NextResponse.next();
 
         const cookieName = getCookieName(CSRF_COOKIE_NAME);
 
-        const token = generateCsrfToken();
+        const token = await generateCsrfToken();
 
         const res = NextResponse.next();
         

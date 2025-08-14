@@ -1,7 +1,8 @@
 import { hmac } from '@noble/hashes/hmac';
 import { sha256 } from "@noble/hashes/sha2";
 import { NextRequest } from 'next/server';
-import { getCookieName } from './cookie';
+import { getCookieName } from '../../core/lib';
+import { getSecureRandomBytes } from './random';
 
 function toHex(buffer: Uint8Array) {
   return Array.from(buffer).map(b => b.toString(16).padStart(2, '0')).join('');
@@ -11,8 +12,8 @@ const secret = new TextEncoder().encode(process.env.AUTHKIT_SECRET!);
 
 export const CSRF_COOKIE_NAME = "auth-kit.csrf-token";
 
-export function generateCsrfToken() {
-    const tokenArray = crypto.getRandomValues(new Uint8Array(32));
+export async function generateCsrfToken() {
+    const tokenArray = await getSecureRandomBytes(32);
     const token = toHex(tokenArray);
     const timestamp = Date.now();
     const data = new TextEncoder().encode(`${token}:${timestamp}`);
