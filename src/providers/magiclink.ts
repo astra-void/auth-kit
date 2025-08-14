@@ -32,76 +32,130 @@ export function MagiclinkProvider(
                 html: `
                     <!DOCTYPE html>
                     <html lang="en">
-                        <head>
-                        <meta charset="UTF-8" />
-                        <title>Magic Login Link</title>
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>Sign in to your account</title>
                         <style>
-                            body {
-                            background-color: #f4f4f5;
-                            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-                            margin: 0;
-                            padding: 40px 16px;
-                            color: #0f172a;
+                            body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+                            .container { background-color: #fafafa; padding: 60px 20px; }
+                            .email-card { background-color: #ffffff; max-width: 420px; margin: 0 auto; border-radius: 8px; border: 1px solid #e4e4e7; }
+                            .header { padding: 60px 40px 40px; text-align: center; }
+                            .title { font-size: 24px; font-weight: 500; margin: 0 0 12px; color: #18181b; }
+                            .subtitle { font-size: 15px; color: #52525b; margin: 0; line-height: 1.5; }
+                            .content { padding: 0 40px 60px; }
+                            .button-container { text-align: center; margin: 40px 0; }
+                            .magic-button { 
+                                display: inline-block; 
+                                background-color: #18181b; 
+                                color: #ffffff; 
+                                text-decoration: none; 
+                                padding: 16px 40px; 
+                                border-radius: 6px; 
+                                font-weight: 500; 
+                                font-size: 15px;
+                                transition: background-color 0.2s;
                             }
-                            .container {
-                            background-color: #ffffff;
-                            max-width: 480px;
-                            margin: 0 auto;
-                            padding: 32px;
-                            border-radius: 12px;
-                            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+                            .magic-button:hover { background-color: #27272a; }
+                            .link-box { 
+                                background-color: #fafafa; 
+                                border: 1px solid #e4e4e7; 
+                                border-radius: 6px; 
+                                padding: 20px; 
+                                margin: 32px 0; 
                             }
-                            h1 {
-                            font-size: 20px;
-                            margin-bottom: 16px;
-                            color: #1e293b;
+                            .link-label { font-size: 13px; color: #52525b; margin: 0 0 8px; }
+                            .link-url { 
+                                font-size: 12px; 
+                                color: #374151; 
+                                word-break: break-all; 
+                                font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+                                line-height: 1.4;
                             }
-                            p {
-                            font-size: 15px;
-                            margin-bottom: 20px;
-                            line-height: 1.6;
+                            .expires { font-size: 13px; color: #71717a; margin: 32px 0 0; text-align: center; }
+                            .footer { 
+                                background-color: #fafafa; 
+                                padding: 24px 40px; 
+                                border-top: 1px solid #e4e4e7; 
+                                text-align: center; 
                             }
-                            a.button {
-                            display: inline-block;
-                            background-color: #2563eb;
-                            color: #ffffff !important;
-                            text-decoration: none;
-                            padding: 14px 24px;
-                            border-radius: 8px;
-                            font-weight: 600;
-                            font-size: 15px;
-                            margin: 16px 0;
+                            .footer-text { font-size: 12px; color: #71717a; margin: 0; }
+
+                            @media (prefers-color-scheme: dark) {
+                                .container { background-color: #09090b !important; }
+                                .email-card { 
+                                    background-color: #18181b !important; 
+                                    border-color: #27272a !important; 
+                                }
+                                .title { color: #fafafa !important; }
+                                .subtitle { color: #a1a1aa !important; }
+                                .link-box { 
+                                    background-color: #27272a !important; 
+                                    border-color: #3f3f46 !important; 
+                                }
+                                .link-label { color: #a1a1aa !important; }
+                                .link-url { color: #d4d4d8 !important; }
+                                .expires { color: #71717a !important; }
+                                .footer { 
+                                    background-color: #27272a !important; 
+                                    border-color: #3f3f46 !important; 
+                                }
+                                .footer-text { color: #71717a !important; }
+                                .magic-button { 
+                                    background-color: #fafafa !important; 
+                                    color: #18181b !important; 
+                                }
+                                .magic-button:hover { background-color: #e4e4e7 !important; }
                             }
-                            .link-raw {
-                            font-size: 13px;
-                            background-color: #f1f5f9;
-                            padding: 10px;
-                            border-radius: 6px;
-                            word-break: break-all;
-                            color: #334155;
+                                
+                            [data-ogsc] .container { background-color: #09090b !important; }
+                            [data-ogsc] .email-card { 
+                                background-color: #18181b !important; 
+                                border-color: #27272a !important; 
                             }
-                            .footer {
-                            font-size: 12px;
-                            color: #64748b;
-                            margin-top: 24px;
-                            border-top: 1px solid #e2e8f0;
-                            padding-top: 16px;
+                            [data-ogsc] .title { color: #fafafa !important; }
+                            [data-ogsc] .subtitle { color: #a1a1aa !important; }
+                            [data-ogsc] .magic-button { 
+                                background-color: #fafafa !important; 
+                                color: #18181b !important; 
+                            }
+                            
+                            @media only screen and (max-width: 480px) {
+                                .container { padding: 40px 16px; }
+                                .header { padding: 40px 24px 24px; }
+                                .content { padding: 0 24px 40px; }
+                                .footer { padding: 20px 24px; }
+                                .title { font-size: 20px; }
+                                .magic-button { padding: 14px 32px; font-size: 14px; }
                             }
                         </style>
                         </head>
                         <body>
-                        <div class="container">
-                            <h1>🔐 Sign in to Your Account</h1>
-                            <p>
-                            Click the button below to sign in. This link will expire in 15 minutes for your security.
-                            </p>
-                            <a href="${callbackUrl}" class="button">Sign In</a>
-                            <p>If the button above doesn't work, copy and paste the URL below into your browser:</p>
-                            <div class="link-raw">${callbackUrl}</div>
-                            <div class="footer">
-                            If you did not request this email, you can safely ignore it.
+                            <div class="container">
+                                <div class="email-card">
+                                <div class="header">
+                                    <h1 class="title">Sign in to your account</h1>
+                                    <p class="subtitle">Click the button below to sign in securely</p>
+                                </div>
+                                
+                                <div class="content">
+                                    <div class="button-container">
+                                    <a href="${callbackUrl}" class="magic-button">Sign in</a>
+                                    </div>
+                                    
+                                    <div class="link-box">
+                                    <p class="link-label">Or copy this link:</p>
+                                    <div class="link-url">${callbackUrl}</div>
+                                    </div>
+                                    
+                                    <p class="expires">Link expires in 15 minutes</p>
+                                </div>
+                                
+                                <div class="footer">
+                                    <p class="footer-text">Sent to ${user.email} • Ignore if you didn't request this</p>
+                                </div>
+                                </div>
                             </div>
-                        </div>
                         </body>
                     </html>
                 `,
