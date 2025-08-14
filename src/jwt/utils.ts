@@ -4,9 +4,9 @@ import { sha256 } from '@noble/hashes/sha2';
 export async function getEncryptionKey(secret: string, salt: string = '') {
     return hkdf(
         sha256,
-        `Generated Encryption Key${salt ? `(${salt})` : ''}`,
-        salt,
         secret,
+        salt,
+        `Generated Encryption Key${salt ? `(${salt})` : ''}`,
         32
     );
 }

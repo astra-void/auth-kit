@@ -13,7 +13,7 @@ export async function signJWT({
     const maxAge = options?.maxAge ?? 3600;
     const salt = options?.salt ?? '';
 
-    if (!secret) return;
+    if (!secret) throw new Error('AUTHKIT_SECRET is not configured');;
 
     const encryptionKey = await getEncryptionKey(secret, salt);
 
