@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { AdapterUser } from "../../adapters";
-import { SessionStatus, User, UseSessionResult } from "./types";
+import { SessionStatus, User, Session } from "./types";
 import { getSession } from "../getSession";
 
-export function useSession(): UseSessionResult {
+export function useSession(): Session {
     const [user, setUser] = useState<User | AdapterUser | null>(null);
     const [status, setStatus] = useState<SessionStatus>("loading");
 

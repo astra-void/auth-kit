@@ -31,8 +31,9 @@ export async function login(
             if (params?.email) {
                 const { email } = params;
 
-                const options = (await authRequest<any>('POST', "/api/auth/login/passkey/options", { email }))?.data.authOptions;
-                const credential = await startAuthentication({ optionsJSON: options });
+                const optionsRes = (await authRequest<any>('POST', "/api/auth/login/passkey/options", { email }));
+                const authOptions = optionsRes?.data?.authOptions ?? optionsRes?.data
+                const credential = await startAuthentication({ optionsJSON: authOptions });
                 body.credential = credential;
 
                 const verification = (await authRequest<any>('POST', '/api/auth/login', body))?.data.success;
@@ -47,8 +48,9 @@ export async function login(
                 }
             }
 
-            const options = (await authRequest<any>('POST', "/api/auth/login/passkey/options"))?.data.authOptions;
-            const credential = await startAuthentication({ optionsJSON: options });
+            const optionsRes = (await authRequest<any>('POST', "/api/auth/login/passkey/options"));
+            const authOptions = optionsRes?.data?.authOptions ?? optionsRes?.data
+            const credential = await startAuthentication({ optionsJSON: authOptions });
             body.credential= credential;
 
             const verification = (await authRequest<any>('POST', '/api/auth/login', body))?.data.success;
@@ -78,8 +80,6 @@ export async function login(
     if (!data || status !== 200) {
       return null;
     }
-
-    console.log(data);
     
     if (data.requiresTotp && !params?.otpCode) {
       return { requiresTotp: true };
