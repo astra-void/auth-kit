@@ -1,6 +1,6 @@
 {
   "name": "@astra-void/auth-kit",
-  "version": "0.6.8",
+  "version": "0.6.9",
   "description": "Next.js authentication with passkey support",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -42,7 +42,7 @@
   },
   "scripts": {
     "build": "tsup && tsc --emitDeclarationOnly --declaration --outDir dist && pnpm pack",
-    "dev": "tsup src/index.ts --watch --format esm,cjs --dts --outDir dist",
+    "dev": "tsup src/index.ts --watch --format esm --dts --outDir dist",
     "lint": "eslint",
     "test": "jest --config ./jest.config.js"
   },
@@ -52,10 +52,7 @@
     "nextjs",
     "passkey",
     "authentication",
-    "login",
     "webauthn",
-    "auth",
-    "prisma",
     "react"
   ],
   "author": "astra-void",
