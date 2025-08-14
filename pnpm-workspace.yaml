@@ -1,2 +1,5 @@
 ignoredBuiltDependencies:
   - '@prisma/client'
+
+overrides:
+  '@eslint/plugin-kit@<0.3.4': '>=0.3.4'
